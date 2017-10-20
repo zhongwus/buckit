@@ -18,12 +18,14 @@
 
 #import "MDCAppBarContainerViewController.h"
 
+#import "MaterialApplication.h"
 #import "MaterialFlexibleHeader.h"
 #import "MaterialIcons+ic_arrow_back.h"
 #import "MaterialRTL.h"
 #import "MaterialShadowElevations.h"
 #import "MaterialShadowLayer.h"
 #import "MaterialTypography.h"
+#import "MaterialUIMetrics.h"
 #import "MDFTextAccessibility.h"
 #import "private/MaterialAppBarStrings.h"
 #import "private/MaterialAppBarStrings_table.h"
@@ -33,7 +35,6 @@ static NSString *const kStatusBarHeightKey = @"statusBarHeight";
 static NSString *const MDCAppBarHeaderViewControllerKey = @"MDCAppBarHeaderViewControllerKey";
 static NSString *const MDCAppBarNavigationBarKey = @"MDCAppBarNavigationBarKey";
 static NSString *const MDCAppBarHeaderStackViewKey = @"MDCAppBarHeaderStackViewKey";
-static const CGFloat kStatusBarHeight = 20;
 
 // The Bundle for string resources.
 static NSString *const kMaterialAppBarBundle = @"MaterialAppBar.bundle";
@@ -182,7 +183,9 @@ static NSString *const kMaterialAppBarBundle = @"MaterialAppBar.bundle";
 
 @end
 
-@implementation MDCAppBarViewController
+@implementation MDCAppBarViewController {
+  NSLayoutConstraint *_verticalConstraint;
+}
 
 - (MDCHeaderStackView *)headerStackView {
   // Removed call to loadView here as we should never be calling it manually.
@@ -300,7 +303,6 @@ static NSString *const kMaterialAppBarBundle = @"MaterialAppBar.bundle";
   [self.view addSubview:self.headerStackView];
 
   // Bar stack expands vertically, but has a margin above it for the status bar.
-
   NSArray<NSLayoutConstraint *> *horizontalConstraints = [NSLayoutConstraint
       constraintsWithVisualFormat:[NSString stringWithFormat:@"H:|[%@]|", kBarStackKey]
                           options:0
@@ -308,15 +310,23 @@ static NSString *const kMaterialAppBarBundle = @"MaterialAppBar.bundle";
                             views:@{kBarStackKey : self.headerStackView}];
   [self.view addConstraints:horizontalConstraints];
 
-  NSArray<NSLayoutConstraint *> *verticalConstraints = [NSLayoutConstraint
-      constraintsWithVisualFormat:[NSString stringWithFormat:@"V:|-%@-[%@]|", kStatusBarHeightKey,
-                                                             kBarStackKey]
-                          options:0
-                          metrics:@{
-                            kStatusBarHeightKey : @(kStatusBarHeight)
-                          }
-                            views:@{kBarStackKey : self.headerStackView}];
-  [self.view addConstraints:verticalConstraints];
+  CGFloat topMargin = MDCDeviceTopSafeAreaInset();
+  _verticalConstraint = [NSLayoutConstraint constraintWithItem:self.headerStackView
+                                                     attribute:NSLayoutAttributeTop
+                                                     relatedBy:NSLayoutRelationEqual
+                                                        toItem:self.view
+                                                     attribute:NSLayoutAttributeTop
+                                                    multiplier:1
+                                                      constant:topMargin];
+  _verticalConstraint.active = YES;
+
+  [NSLayoutConstraint constraintWithItem:self.headerStackView
+                               attribute:NSLayoutAttributeBottom
+                               relatedBy:NSLayoutRelationEqual
+                                  toItem:self.view
+                               attribute:NSLayoutAttributeBottom
+                              multiplier:1
+                                constant:0].active = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -326,6 +336,18 @@ static NSString *const kMaterialAppBarBundle = @"MaterialAppBar.bundle";
   if (backBarButtonItem && !self.navigationBar.backItem) {
     self.navigationBar.backItem = backBarButtonItem;
   }
+}
+
+- (void)viewWillLayoutSubviews {
+  [super viewWillLayoutSubviews];
+
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    // We only update the top inset on iOS 11 because previously we were not adjusting the header
+    // height to make it smaller when the status bar is hidden.
+    _verticalConstraint.constant = MDCDeviceTopSafeAreaInset();
+  }
+#endif
 }
 
 #pragma mark User actions

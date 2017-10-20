@@ -17,8 +17,8 @@
 #import "MDCAlertController.h"
 
 #import "MDCDialogTransitionController.h"
+#import "MDFInternationalization.h"
 #import "MaterialButtons.h"
-#import "MaterialRTL.h"
 #import "MaterialTypography.h"
 #import "private/MaterialDialogsStrings.h"
 #import "private/MaterialDialogsStrings_table.h"
@@ -177,7 +177,6 @@ static const CGFloat MDCDialogMessageOpacity = 0.54f;
   actionButton.mdc_adjustsFontForContentSizeCategory = self.mdc_adjustsFontForContentSizeCategory;
   [actionButton setTitle:action.title forState:UIControlStateNormal];
   // TODO(#1726): Determine default text color values for Normal and Disabled
-  [actionButton sizeToFit];
   CGRect buttonRect = actionButton.bounds;
   buttonRect.size.height = MAX(buttonRect.size.height, MDCDialogActionButtonHeight);
   buttonRect.size.width = MAX(buttonRect.size.width, MDCDialogActionButtonMinimumWidth);
@@ -328,6 +327,10 @@ static const CGFloat MDCDialogMessageOpacity = 0.54f;
 - (void)viewWillLayoutSubviews {
   [super viewWillLayoutSubviews];
 
+  for (UIButton *button in self.actionButtons) {
+    [button sizeToFit];
+  }
+
   // Recalculate preferredSize, which is based on width available, if the viewSize has changed.
   if (CGRectGetWidth(self.view.bounds) != _previousLayoutSize.width ||
       CGRectGetHeight(self.view.bounds) != _previousLayoutSize.height) {
@@ -429,12 +432,11 @@ static const CGFloat MDCDialogMessageOpacity = 0.54f;
       }
     }
     // Handle RTL
-    if (self.view.mdc_effectiveUserInterfaceLayoutDirection ==
+    if (self.view.mdf_effectiveUserInterfaceLayoutDirection ==
         UIUserInterfaceLayoutDirectionRightToLeft) {
       for (UIButton *button in self.actionButtons) {
-        CGRect buttonRect = button.frame;
-        CGRect flippedRect = MDCRectFlippedForRTL(buttonRect, CGRectGetWidth(self.view.bounds),
-                                                  UIUserInterfaceLayoutDirectionRightToLeft);
+        CGRect flippedRect =
+          MDFRectFlippedHorizontally(button.frame, CGRectGetWidth(self.view.bounds));
         button.frame = flippedRect;
       }
     }
@@ -459,7 +461,7 @@ static const CGFloat MDCDialogMessageOpacity = 0.54f;
   } else {
     // Complex layout case : Split the space between the two scrollviews
     if (CGRectGetHeight(contentScrollViewRect) < CGRectGetHeight(self.view.bounds) * 0.5f) {
-      actionsScrollViewRect.size.height = 
+      actionsScrollViewRect.size.height =
           CGRectGetHeight(self.view.bounds) - contentScrollViewRect.size.height;
     } else {
       CGFloat maxActionsHeight = CGRectGetHeight(self.view.bounds) * 0.5f;

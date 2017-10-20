@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import Alamofire
 
 class CreateChallengeViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -14,7 +15,6 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.backItem?.title = "Back"
         // Do any additional setup after loading the view.
     }
     
@@ -23,10 +23,7 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    @IBAction func doneCreating(_ sender: Any) {
-        
-    }
+
     
     @IBAction func choosePhoto(_ sender: Any) {
         let imagePickerController = UIImagePickerController()
@@ -44,7 +41,7 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
             self.present(imagePickerController, animated: true, completion: nil)
         }))
         
-        actionSheet.addAction(UIAlertAction(title: "Camera", style: .default, handler: nil))
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .default, handler: nil))
         
         self.present(actionSheet, animated: true, completion: nil)
         
@@ -63,6 +60,13 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
         picker.dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func donePickingImage(_ sender: Any) {
+        performSegue(withIdentifier: "segue2", sender: nil)
+    }
+    
+    @IBAction func nextClicked(_ sender: Any) {
+        performSegue(withIdentifier: "segue2", sender: nil)
+    }
     
     
 

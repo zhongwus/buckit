@@ -10,8 +10,11 @@
 		0BAF56557981162B052A7FC2 /* Pods_NewBuckitAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BE67A8B7FAF1B5A4D4C2B2D0 /* Pods_NewBuckitAppUITests.framework */; };
 		394CECEA9F701BC498753D27 /* Pods_NewBuckitAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 368E5F94CCE91BE4A1EB2BA1 /* Pods_NewBuckitAppTests.framework */; };
 		9FBD4C0D8733654C56A9FDAE /* Pods_NewBuckitApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCDFD138CADE145F2CA7275D /* Pods_NewBuckitApp.framework */; };
+		F4385BCF1F96C32900BE9FA8 /* OverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4385BCE1F96C32900BE9FA8 /* OverlayView.xib */; };
+		F43EC52D1F9957670043C96A /* sideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43EC52C1F9957670043C96A /* sideBarViewController.swift */; };
+		F45A856C1F901160001A761B /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45A856B1F901160001A761B /* User.swift */; };
+		F45A856E1F90131D001A761B /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45A856D1F90131D001A761B /* UserViewModel.swift */; };
 		F46691931F8AF9C600FE6E33 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691921F8AF9C600FE6E33 /* AppDelegate.swift */; };
-		F46691951F8AF9C600FE6E33 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691941F8AF9C600FE6E33 /* ViewController.swift */; };
 		F46691981F8AF9C600FE6E33 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F46691961F8AF9C600FE6E33 /* Main.storyboard */; };
 		F466919A1F8AF9C600FE6E33 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F46691991F8AF9C600FE6E33 /* Assets.xcassets */; };
 		F466919D1F8AF9C600FE6E33 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F466919B1F8AF9C600FE6E33 /* LaunchScreen.storyboard */; };
@@ -20,7 +23,6 @@
 		F46691C31F8AFACF00FE6E33 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C21F8AFACF00FE6E33 /* LoginViewController.swift */; };
 		F46691C51F8AFADB00FE6E33 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */; };
 		F46691C71F8B132C00FE6E33 /* CreateChallengeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */; };
-		F46691C91F8B29D900FE6E33 /* MainNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C81F8B29D900FE6E33 /* MainNavigationController.swift */; };
 		F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -50,9 +52,12 @@
 		BE67A8B7FAF1B5A4D4C2B2D0 /* Pods_NewBuckitAppUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NewBuckitAppUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCDFD138CADE145F2CA7275D /* Pods_NewBuckitApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NewBuckitApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA0DE15EAE868B0FFAA894AE /* Pods-NewBuckitAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NewBuckitAppUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NewBuckitAppUITests/Pods-NewBuckitAppUITests.release.xcconfig"; sourceTree = "<group>"; };
+		F4385BCE1F96C32900BE9FA8 /* OverlayView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OverlayView.xib; sourceTree = "<group>"; };
+		F43EC52C1F9957670043C96A /* sideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sideBarViewController.swift; sourceTree = "<group>"; };
+		F45A856B1F901160001A761B /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		F45A856D1F90131D001A761B /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		F466918F1F8AF9C600FE6E33 /* NewBuckitApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewBuckitApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F46691921F8AF9C600FE6E33 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F46691941F8AF9C600FE6E33 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F46691971F8AF9C600FE6E33 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F46691991F8AF9C600FE6E33 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F466919C1F8AF9C600FE6E33 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -66,7 +71,6 @@
 		F46691C21F8AFACF00FE6E33 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChallengeViewController.swift; sourceTree = "<group>"; };
-		F46691C81F8B29D900FE6E33 /* MainNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainNavigationController.swift; sourceTree = "<group>"; };
 		F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFriendsViewController.swift; sourceTree = "<group>"; };
 		F87BC1735A493DBC3EC8E020 /* Pods-NewBuckitApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NewBuckitApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NewBuckitApp/Pods-NewBuckitApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -151,8 +155,7 @@
 				F46691CC1F8C080600FE6E33 /* Models */,
 				F46691921F8AF9C600FE6E33 /* AppDelegate.swift */,
 				F46691CD1F8C080D00FE6E33 /* ViewModels */,
-				F46691941F8AF9C600FE6E33 /* ViewController.swift */,
-				F46691C81F8B29D900FE6E33 /* MainNavigationController.swift */,
+				F4385BCE1F96C32900BE9FA8 /* OverlayView.xib */,
 				F46691961F8AF9C600FE6E33 /* Main.storyboard */,
 				F46691991F8AF9C600FE6E33 /* Assets.xcassets */,
 				F466919B1F8AF9C600FE6E33 /* LaunchScreen.storyboard */,
@@ -186,6 +189,7 @@
 				F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */,
 				F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */,
 				F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */,
+				F43EC52C1F9957670043C96A /* sideBarViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -193,6 +197,7 @@
 		F46691CC1F8C080600FE6E33 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				F45A856B1F901160001A761B /* User.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -200,6 +205,7 @@
 		F46691CD1F8C080D00FE6E33 /* ViewModels */ = {
 			isa = PBXGroup;
 			children = (
+				F45A856D1F90131D001A761B /* UserViewModel.swift */,
 			);
 			path = ViewModels;
 			sourceTree = "<group>";
@@ -321,6 +327,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F466919D1F8AF9C600FE6E33 /* LaunchScreen.storyboard in Resources */,
+				F4385BCF1F96C32900BE9FA8 /* OverlayView.xib in Resources */,
 				F466919A1F8AF9C600FE6E33 /* Assets.xcassets in Resources */,
 				F46691981F8AF9C600FE6E33 /* Main.storyboard in Resources */,
 			);
@@ -454,13 +461,18 @@
 				"${BUILT_PRODUCTS_DIR}/FacebookLogin/FacebookLogin.framework",
 				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/Koloda/Koloda.framework",
+				"${BUILT_PRODUCTS_DIR}/MDFInternationalization/MDFInternationalization.framework",
 				"${BUILT_PRODUCTS_DIR}/MDFTextAccessibility/MDFTextAccessibility.framework",
 				"${BUILT_PRODUCTS_DIR}/MaterialComponents/MaterialComponents.framework",
 				"${BUILT_PRODUCTS_DIR}/MotionAnimator/MotionAnimator.framework",
 				"${BUILT_PRODUCTS_DIR}/MotionInterchange/MotionInterchange.framework",
 				"${BUILT_PRODUCTS_DIR}/MotionTransitioning/MotionTransitioning.framework",
+				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
+				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+				"${BUILT_PRODUCTS_DIR}/pop/pop.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
@@ -472,13 +484,18 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookLogin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Koloda.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MDFInternationalization.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MDFTextAccessibility.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MaterialComponents.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionAnimator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionInterchange.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionTransitioning.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/pop.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -526,12 +543,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */,
-				F46691C91F8B29D900FE6E33 /* MainNavigationController.swift in Sources */,
+				F45A856C1F901160001A761B /* User.swift in Sources */,
 				F46691C71F8B132C00FE6E33 /* CreateChallengeViewController.swift in Sources */,
 				F46691C31F8AFACF00FE6E33 /* LoginViewController.swift in Sources */,
-				F46691951F8AF9C600FE6E33 /* ViewController.swift in Sources */,
 				F46691931F8AF9C600FE6E33 /* AppDelegate.swift in Sources */,
+				F45A856E1F90131D001A761B /* UserViewModel.swift in Sources */,
 				F46691C51F8AFADB00FE6E33 /* HomeViewController.swift in Sources */,
+				F43EC52D1F9957670043C96A /* sideBarViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -634,7 +652,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -685,7 +703,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
@@ -699,6 +717,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = F4J8H8Z43G;
 				INFOPLIST_FILE = NewBuckitApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhongwu.NewBuckitApp;
@@ -714,6 +733,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = F4J8H8Z43G;
 				INFOPLIST_FILE = NewBuckitApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.zhongwu.NewBuckitApp;

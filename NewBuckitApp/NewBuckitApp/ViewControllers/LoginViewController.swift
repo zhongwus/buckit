@@ -37,17 +37,18 @@ class LoginViewController: UIViewController {
         print("starting...")
         let loginManager = LoginManager()
 
-        loginManager.logIn([ .publicProfile ], viewController: self) { loginResult in
+        loginManager.logIn(readPermissions: [ .publicProfile ], viewController: self) { loginResult in
             switch loginResult {
             case .failed(let error):
                 print(error)
             case .cancelled:
                 print("User cancelled login.")
             case .success(let grantedPermissions, let declinedPermissions, let accessToken):
-                
                 let storyboard = UIStoryboard(name:"Main",bundle:nil)
                 let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
+                mainNavigationController.modalTransitionStyle = .flipHorizontal
                 self.present(mainNavigationController, animated: true, completion: nil)
+                print("ended")
             }
             
         }

@@ -16,6 +16,7 @@
 
 #import "MaterialTextFields.h"
 
+#import "MDCMultilineTextInputDelegate.h"
 #import "MDCPaddedLabel.h"
 #import "MDCTextInputArt.h"
 #import "MDCTextInputBorderView.h"
@@ -132,6 +133,7 @@ static inline UIColor *MDCTextInputUnderlineColor() {
 
     // Initialize elements of UI
     [self setupPlaceholderLabel];
+    [self setupUnderlineView];
     [self setupClearButton];
     [self setupUnderlineLabels];
 
@@ -403,6 +405,10 @@ static inline UIColor *MDCTextInputUnderlineColor() {
 
   [NSLayoutConstraint activateConstraints:@[ leadingBottom, trailingBottom ]];
 
+  // When push comes to shove, the leading label is more likely to expand than the trailing.
+  [_leadingUnderlineLabel setContentHuggingPriority:UILayoutPriorityDefaultLow - 1
+                                                forAxis:UILayoutConstraintAxisHorizontal];
+
   [_trailingUnderlineLabel
       setContentCompressionResistancePriority:UILayoutPriorityRequired
                                       forAxis:UILayoutConstraintAxisHorizontal];
@@ -410,16 +416,14 @@ static inline UIColor *MDCTextInputUnderlineColor() {
                                              forAxis:UILayoutConstraintAxisHorizontal];
 }
 
-- (MDCTextInputUnderlineView *)setupUnderlineView {
-  MDCTextInputUnderlineView *underline =
+- (void)setupUnderlineView {
+  _underline =
       [[MDCTextInputUnderlineView alloc] initWithFrame:CGRectZero];
-  underline.color = MDCTextInputUnderlineColor();
-  underline.translatesAutoresizingMaskIntoConstraints = NO;
+  _underline.color = MDCTextInputUnderlineColor();
+  _underline.translatesAutoresizingMaskIntoConstraints = NO;
 
-  [self.textInput addSubview:underline];
-  [self.textInput sendSubviewToBack:underline];
-
-  return underline;
+  [self.textInput addSubview:_underline];
+  [self.textInput sendSubviewToBack:_underline];
 }
 
 #pragma mark - Border implementation
@@ -534,20 +538,32 @@ static inline UIColor *MDCTextInputUnderlineColor() {
 }
 
 - (void)updateClearButtonConstraints {
-  CGFloat constant = MDCTextInputClearButtonImageSquareWidthHeight * [self clearButtonAlpha];
-  if (self.clearButtonWidth.constant != constant) {
-    self.clearButtonWidth.constant = constant;
-    [self.textInput invalidateIntrinsicContentSize];
+  BOOL shouldInvalidateSize = NO;
+  CGFloat widthConstant = MDCTextInputClearButtonImageSquareWidthHeight * [self clearButtonAlpha];
+  if (self.clearButtonWidth.constant != widthConstant) {
+    self.clearButtonWidth.constant = widthConstant;
+    shouldInvalidateSize = YES;
   }
 
   UIEdgeInsets insets = [self textInsets];
-  
-  self.clearButtonTrailing.constant =
-      MDCTextInputClearButtonImageBuiltInPadding - insets.right;
+
+  CGFloat trailingConstant = MDCTextInputClearButtonImageBuiltInPadding - insets.right;
+  if (self.clearButtonTrailing.constant != trailingConstant) {
+    self.clearButtonTrailing.constant = trailingConstant;
+    shouldInvalidateSize = YES;
+  }
+
   CGFloat scale = UIScreen.mainScreen.scale;
   CGFloat centerYConstant = insets.top +
       (MDCCeil(self.textInput.font.lineHeight * scale) / scale) / 2.f;
-  self.clearButtonCenterY.constant = centerYConstant;
+  if (self.clearButtonCenterY.constant != centerYConstant) {
+    self.clearButtonCenterY.constant = centerYConstant;
+    shouldInvalidateSize = YES;
+  }
+
+  if (shouldInvalidateSize) {
+    [self.textInput invalidateIntrinsicContentSize];
+  }
 }
 
 - (CGFloat)clearButtonAlpha {
@@ -598,6 +614,22 @@ static inline UIColor *MDCTextInputUnderlineColor() {
 }
 
 - (void)clearButtonDidTouch {
+  if ([self.textInput isKindOfClass:[MDCTextField class]]) {
+    MDCTextField *textField = (MDCTextField *)self.textInput;
+    if ([textField.delegate respondsToSelector:@selector(textFieldShouldClear:)] &&
+        ![textField.delegate textFieldShouldClear:textField]) {
+      return;
+    }
+  }
+
+  if ([self.textInput isKindOfClass:[MDCMultilineTextField class]]) {
+    MDCMultilineTextField *textField = (MDCMultilineTextField *)self.textInput;
+    if ([textField.multilineDelegate respondsToSelector:@selector(multilineTextFieldShouldClear:)] && 
+        ![textField.multilineDelegate multilineTextFieldShouldClear:textField]) {
+      return;
+    }
+  }
+
   self.textInput.text = nil;
 }
 
@@ -759,14 +791,6 @@ static inline UIColor *MDCTextInputUnderlineColor() {
 
 - (void)setTrailingView:(UIView *)trailingView {
   self.textInput.trailingView = trailingView;
-}
-
-- (MDCTextInputUnderlineView *)underline {
-  if (!_underline) {
-    _underline = [self setupUnderlineView];
-  }
-
-  return _underline;
 }
 
 #pragma mark - Layout
