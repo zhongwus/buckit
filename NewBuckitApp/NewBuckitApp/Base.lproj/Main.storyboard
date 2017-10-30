@@ -4,7 +4,8 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13173"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13174"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -99,6 +100,28 @@
             </objects>
             <point key="canvasLocation" x="2253.5999999999999" y="-1178.8605697151424"/>
         </scene>
+        <!--Profile View Controller-->
+        <scene sceneID="ACi-XR-gXa">
+            <objects>
+                <viewController id="e4m-gj-Wh6" customClass="ProfileViewController" customModule="NewBuckitApp" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="0ov-I5-ctO">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yg4-s4-x8G">
+                                <rect key="frame" x="55" y="165" width="240" height="128"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.0" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <viewLayoutGuide key="safeArea" id="n4h-Sa-CTO"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Gpk-h4-Ecx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3067" y="-1266"/>
+        </scene>
         <!--Home-->
         <scene sceneID="smA-BT-aZr">
             <objects>
@@ -107,10 +130,61 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5zb-FR-pdh">
-                                <rect key="frame" x="111" y="494" width="153" height="54"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bfb-3v-qSP" customClass="KolodaView" customModule="Koloda">
+                                <rect key="frame" x="24" y="81" width="327" height="380"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="380" id="hDd-Hd-eEx"/>
+                                </constraints>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ves-SI-mPW">
+                                <rect key="frame" x="24" y="485" width="327" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IQK-Wf-Bia">
+                                        <rect key="frame" x="0.0" y="0.0" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="50" id="d34-4E-EeX"/>
+                                            <constraint firstAttribute="height" constant="50" id="gmC-01-2tU"/>
+                                        </constraints>
+                                        <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Button">
+                                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="dislikeClicked:" destination="hsI-aU-UOP" eventType="touchUpInside" id="fDl-hW-em0"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XQP-p8-CdV">
+                                        <rect key="frame" x="277" y="0.0" width="50" height="50"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="50" id="0gC-OY-Xgn"/>
+                                            <constraint firstAttribute="height" constant="50" id="Mxo-B5-9Sl"/>
+                                        </constraints>
+                                        <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <state key="normal" title="Button">
+                                            <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="likeClicked:" destination="hsI-aU-UOP" eventType="touchUpInside" id="7fs-lx-cYz"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstItem="IQK-Wf-Bia" firstAttribute="leading" secondItem="ves-SI-mPW" secondAttribute="leading" id="V5G-XL-mUF"/>
+                                    <constraint firstItem="XQP-p8-CdV" firstAttribute="top" secondItem="ves-SI-mPW" secondAttribute="top" id="dDT-Qt-UwF"/>
+                                    <constraint firstAttribute="height" constant="50" id="lfM-Pd-cVD"/>
+                                    <constraint firstItem="IQK-Wf-Bia" firstAttribute="top" secondItem="ves-SI-mPW" secondAttribute="top" id="pB7-c1-iPX"/>
+                                    <constraint firstAttribute="trailing" secondItem="XQP-p8-CdV" secondAttribute="trailing" id="zyh-KQ-rne"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5zb-FR-pdh">
+                                <rect key="frame" x="117.5" y="545" width="140" height="54"/>
                                 <color key="backgroundColor" red="0.054901960784313725" green="0.19607843137254902" blue="0.36862745098039218" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="54" id="VEg-tP-zHf"/>
+                                    <constraint firstAttribute="width" constant="140" id="ska-Wi-22a"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <state key="normal" title="Create Challenge">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -119,44 +193,17 @@
                                     <action selector="testBtnClicked:" destination="hsI-aU-UOP" eventType="touchUpInside" id="yzc-TV-qW6"/>
                                 </connections>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IQK-Wf-Bia">
-                                <rect key="frame" x="45" y="408" width="67" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="Button">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="dislikeClicked:" destination="hsI-aU-UOP" eventType="touchUpInside" id="fDl-hW-em0"/>
-                                </connections>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XQP-p8-CdV">
-                                <rect key="frame" x="269" y="408" width="58" height="45"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="tintColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <state key="normal" title="Button">
-                                    <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="likeClicked:" destination="hsI-aU-UOP" eventType="touchUpInside" id="7fs-lx-cYz"/>
-                                </connections>
-                            </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bfb-3v-qSP" customClass="KolodaView" customModule="Koloda">
-                                <rect key="frame" x="24" y="81" width="327" height="300"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="300" id="MB3-1B-Qeu"/>
-                                    <constraint firstAttribute="height" constant="300" id="zAx-uw-fZ5"/>
-                                </constraints>
-                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
-                            <constraint firstItem="bfb-3v-qSP" firstAttribute="leading" secondItem="fFw-zt-gHs" secondAttribute="leading" constant="24" id="BC7-1q-HIj"/>
-                            <constraint firstItem="fFw-zt-gHs" firstAttribute="trailing" secondItem="bfb-3v-qSP" secondAttribute="trailing" constant="24" id="VZl-AJ-ScD"/>
-                            <constraint firstItem="bfb-3v-qSP" firstAttribute="leading" secondItem="fFw-zt-gHs" secondAttribute="leading" constant="24" id="lch-cg-LsE"/>
-                            <constraint firstItem="bfb-3v-qSP" firstAttribute="top" secondItem="fFw-zt-gHs" secondAttribute="top" constant="17" id="oxO-hx-5Cl"/>
-                            <constraint firstItem="fFw-zt-gHs" firstAttribute="trailing" secondItem="bfb-3v-qSP" secondAttribute="trailing" constant="24" id="ygS-RM-4Vk"/>
+                            <constraint firstItem="fFw-zt-gHs" firstAttribute="trailing" secondItem="bfb-3v-qSP" secondAttribute="trailing" constant="24" id="BK0-ew-9rt"/>
+                            <constraint firstItem="bfb-3v-qSP" firstAttribute="top" secondItem="fFw-zt-gHs" secondAttribute="top" constant="17" id="JfH-dg-ZLx"/>
+                            <constraint firstItem="ves-SI-mPW" firstAttribute="leading" secondItem="fFw-zt-gHs" secondAttribute="leading" constant="24" id="P52-mh-rd5"/>
+                            <constraint firstItem="ves-SI-mPW" firstAttribute="top" secondItem="bfb-3v-qSP" secondAttribute="bottom" constant="24" id="afp-lt-1KS"/>
+                            <constraint firstItem="5zb-FR-pdh" firstAttribute="top" secondItem="ves-SI-mPW" secondAttribute="bottom" constant="10" id="jjA-ym-uB7"/>
+                            <constraint firstAttribute="trailing" secondItem="ves-SI-mPW" secondAttribute="trailing" constant="24" id="qyO-Km-afU"/>
+                            <constraint firstItem="5zb-FR-pdh" firstAttribute="centerX" secondItem="HJE-Ss-p2p" secondAttribute="centerX" id="sfT-9W-tUU"/>
+                            <constraint firstItem="bfb-3v-qSP" firstAttribute="leading" secondItem="fFw-zt-gHs" secondAttribute="leading" constant="24" id="yIK-3L-n0f"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="fFw-zt-gHs"/>
                     </view>

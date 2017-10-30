@@ -24,8 +24,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.makeKeyAndVisible()
         let storyboard = UIStoryboard(name:"Main",bundle:nil)
         //FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
-        
-        if (FBSDKAccessToken.current() != nil) {
+        let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
+        window?.rootViewController = mainNavigationController
+        /*if (FBSDKAccessToken.current() != nil) {
             print("token: " + "\(AccessToken.current)")
             let graphRequest:FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: ["fields":"first_name,last_name, picture.type(large)"])
             graphRequest.start(completionHandler: { (connection, result, error) -> Void in
@@ -56,7 +57,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             window?.rootViewController = loginViewController
             print("not logged in")
             //if you are not logged
-        }
+        }*/
         
         return FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }

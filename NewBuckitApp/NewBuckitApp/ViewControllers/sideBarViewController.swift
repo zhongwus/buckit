@@ -14,7 +14,7 @@ class sideBarViewController: UIViewController,UITableViewDataSource, UITableView
     @IBOutlet var avatarImage: UIImageView!
     @IBOutlet var tableView: UITableView!
     
-    let hamburgerMenuTitle: [String] = ["Home", "Search People", "Leaderboard", "Log out"]
+    let hamburgerMenuTitle: [String] = ["Home", "Leaderboard", "Log out"]
     let cellReuseIdentifier = "cell"
     
     override func viewDidLoad() {
@@ -50,6 +50,8 @@ class sideBarViewController: UIViewController,UITableViewDataSource, UITableView
             })*/
             self.view.window?.rootViewController?.dismiss(animated: false, completion: {})
             self.view.window?.rootViewController = loginController
+        } else if (cell?.textLabel?.text == "Home") {
+            
         }
     }
     

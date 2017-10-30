@@ -24,6 +24,10 @@
 		F46691C51F8AFADB00FE6E33 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */; };
 		F46691C71F8B132C00FE6E33 /* CreateChallengeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */; };
 		F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */; };
+		F4A8F39C1FA6AB5500BFD785 /* AlbumView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4A8F39B1FA6AB5500BFD785 /* AlbumView.xib */; };
+		F4A8F3A01FA6AD7C00BFD785 /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */; };
+		F4A8F3A21FA6BDC900BFD785 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */; };
+		F4A8F3A41FA6C87A00BFD785 /* MainContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +76,10 @@
 		F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
 		F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateChallengeViewController.swift; sourceTree = "<group>"; };
 		F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectFriendsViewController.swift; sourceTree = "<group>"; };
+		F4A8F39B1FA6AB5500BFD785 /* AlbumView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = AlbumView.xib; sourceTree = "<group>"; };
+		F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
+		F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
+		F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerViewController.swift; sourceTree = "<group>"; };
 		F87BC1735A493DBC3EC8E020 /* Pods-NewBuckitApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NewBuckitApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NewBuckitApp/Pods-NewBuckitApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -151,6 +159,7 @@
 		F46691911F8AF9C600FE6E33 /* NewBuckitApp */ = {
 			isa = PBXGroup;
 			children = (
+				F4A8F39A1FA6AAE900BFD785 /* Views */,
 				F46691C11F8AFABB00FE6E33 /* ViewControllers */,
 				F46691CC1F8C080600FE6E33 /* Models */,
 				F46691921F8AF9C600FE6E33 /* AppDelegate.swift */,
@@ -190,6 +199,8 @@
 				F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */,
 				F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */,
 				F43EC52C1F9957670043C96A /* sideBarViewController.swift */,
+				F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */,
+				F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -208,6 +219,15 @@
 				F45A856D1F90131D001A761B /* UserViewModel.swift */,
 			);
 			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		F4A8F39A1FA6AAE900BFD785 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				F4A8F39B1FA6AB5500BFD785 /* AlbumView.xib */,
+				F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -326,6 +346,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4A8F39C1FA6AB5500BFD785 /* AlbumView.xib in Resources */,
 				F466919D1F8AF9C600FE6E33 /* LaunchScreen.storyboard in Resources */,
 				F4385BCF1F96C32900BE9FA8 /* OverlayView.xib in Resources */,
 				F466919A1F8AF9C600FE6E33 /* Assets.xcassets in Resources */,
@@ -544,10 +565,13 @@
 			files = (
 				F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */,
 				F45A856C1F901160001A761B /* User.swift in Sources */,
+				F4A8F3A21FA6BDC900BFD785 /* ProfileViewController.swift in Sources */,
 				F46691C71F8B132C00FE6E33 /* CreateChallengeViewController.swift in Sources */,
+				F4A8F3A01FA6AD7C00BFD785 /* AlbumView.swift in Sources */,
 				F46691C31F8AFACF00FE6E33 /* LoginViewController.swift in Sources */,
 				F46691931F8AF9C600FE6E33 /* AppDelegate.swift in Sources */,
 				F45A856E1F90131D001A761B /* UserViewModel.swift in Sources */,
+				F4A8F3A41FA6C87A00BFD785 /* MainContainerViewController.swift in Sources */,
 				F46691C51F8AFADB00FE6E33 /* HomeViewController.swift in Sources */,
 				F43EC52D1F9957670043C96A /* sideBarViewController.swift in Sources */,
 			);

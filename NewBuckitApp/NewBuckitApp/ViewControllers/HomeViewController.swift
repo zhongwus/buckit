@@ -31,7 +31,6 @@ class HomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("runned")
         SideMenuManager.default.menuLeftNavigationController = storyboard!.instantiateViewController(withIdentifier: "leftMenuNavigationController") as? UISideMenuNavigationController
         SideMenuManager.default.menuPresentMode = .menuSlideIn
         //SideMenuManager.default.menuAddPanGestureToPresent(toView: self.navigationController!.navigationBar)
@@ -133,7 +132,7 @@ extension HomeViewController: KolodaViewDelegate {
     }
     
     func koloda(_ koloda: KolodaView, didSelectCardAt index: Int) {
-        UIApplication.shared.openURL(URL(string: "https://yalantis.com/")!)
+        //UIApplication.shared.openURL(URL(string: "https://yalantis.com/")!)
     }
     
 }
@@ -151,7 +150,15 @@ extension HomeViewController: KolodaViewDataSource {
     }
     
     func koloda(_ koloda: KolodaView, viewForCardAt index: Int) -> UIView {
-        return UIImageView(image: dataSource[Int(index)])
+        let albumView = Bundle.main.loadNibNamed("AlbumView", owner: self, options: nil)?[0] as? AlbumView
+        albumView?.layer.borderColor = UIColor.gray.cgColor
+        albumView?.layer.borderWidth = 1
+        albumView?.photoView.image = dataSource[Int(index)] 
+        albumView?.descriptionView.text = "Hello"
+        //customView.center = self.view.center
+        //customView.addSubview(UIImageView(image:dataSource[Int(index)]))
+        //return UIImageView(image: dataSource[Int(index)])
+        return albumView!
     }
     
     func koloda(_ koloda: KolodaView, viewForCardOverlayAt index: Int) -> OverlayView? {
