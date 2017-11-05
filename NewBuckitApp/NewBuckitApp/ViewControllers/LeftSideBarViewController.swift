@@ -1,5 +1,5 @@
 //
-//  sideBarViewController.swift
+//  LeftSideBarViewController.swift
 //  NewBuckitApp
 //
 //  Created by Zhongwu Shi on 19/10/2017.
@@ -8,12 +8,18 @@
 
 import UIKit
 import FBSDKLoginKit
+import SideMenu
+import Alamofire
+import SwiftyJSON
 
-class sideBarViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
+class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITableViewDelegate {
 
-    @IBOutlet var avatarImage: UIImageView!
+    @IBOutlet var avatarImage: UIButton!
     @IBOutlet var tableView: UITableView!
+    @IBOutlet var sidebarNameLabel: UILabel!
     
+    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
+    let defaults = UserDefaults.standard
     let hamburgerMenuTitle: [String] = ["Home", "Leaderboard", "Log out"]
     let cellReuseIdentifier = "cell"
     
@@ -24,6 +30,17 @@ class sideBarViewController: UIViewController,UITableViewDataSource, UITableView
         avatarImage.layer.borderColor = UIColor.black.cgColor
         avatarImage.layer.cornerRadius = avatarImage.frame.height/2
         avatarImage.clipsToBounds = true
+        
+        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)") .responseJSON { response in // 1
+            if let data = response.result.value {
+                let json = JSON(data)["content"]
+                self.sidebarNameLabel.text = json["firstName"].string! + " " + json["lastName"].string!
+                Alamofire.request(json["profilePictureLink"].string!).response { response in
+                   
+                    self.avatarImage.setImage(UIImage(data: response.data!, scale:1), for: .normal)
+                }
+            }
+        }
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
         tableView.tableFooterView = UIView()
@@ -44,14 +61,17 @@ class sideBarViewController: UIViewController,UITableViewDataSource, UITableView
             loginManager.logOut()
             let storyboard = UIStoryboard(name:"Main",bundle:nil)
             let loginController = storyboard.instantiateViewController(withIdentifier: "loginViewController")
-
-            /*self.dismiss(animated: false, completion: {
-                self.view.window?.rootViewController?.dismiss(animated: false, completion: {})
-            })*/
+            
             self.view.window?.rootViewController?.dismiss(animated: false, completion: {})
             self.view.window?.rootViewController = loginController
         } else if (cell?.textLabel?.text == "Home") {
-            
+            self.dismiss(animated: true, completion: {
+                self.defaults.set("home", forKey: "pageName")
+                })
+        } else if (cell?.textLabel?.text == "Leaderboard") {
+            self.dismiss(animated: true, completion: {
+                self.defaults.set("leaderboard", forKey: "pageName")
+                })
         }
     }
     
@@ -66,6 +86,13 @@ class sideBarViewController: UIViewController,UITableViewDataSource, UITableView
         }*/
         return cell
     }
+    
+    @IBAction func profileClick(_ sender: Any) {
+        self.dismiss(animated: true, completion: {
+            self.defaults.set("profile", forKey: "pageName")
+        })
+    }
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

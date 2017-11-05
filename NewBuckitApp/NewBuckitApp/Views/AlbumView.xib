@@ -23,7 +23,7 @@
                     </constraints>
                 </imageView>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eNQ-9l-RwN">
-                    <rect key="frame" x="1" y="322" width="587" height="160"/>
+                    <rect key="frame" x="3" y="322" width="587" height="160"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="textColor"/>
                     <nil key="highlightedColor"/>
@@ -35,8 +35,8 @@
                 <constraint firstItem="0wj-TX-B5g" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="1" id="Mon-qz-kLU"/>
                 <constraint firstItem="0wj-TX-B5g" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" constant="1" id="Nmk-qM-OW1"/>
                 <constraint firstItem="eNQ-9l-RwN" firstAttribute="top" secondItem="0wj-TX-B5g" secondAttribute="bottom" constant="1" id="e1r-eq-mJc"/>
-                <constraint firstItem="eNQ-9l-RwN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="1" id="mGh-6w-vXO"/>
-                <constraint firstItem="eNQ-9l-RwN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" constant="1" id="rPq-bT-wp7"/>
+                <constraint firstItem="eNQ-9l-RwN" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="3" id="mGh-6w-vXO"/>
+                <constraint firstItem="eNQ-9l-RwN" firstAttribute="trailing" secondItem="vUN-kp-3ea" secondAttribute="trailing" constant="3" id="rPq-bT-wp7"/>
                 <constraint firstItem="0wj-TX-B5g" firstAttribute="top" secondItem="vUN-kp-3ea" secondAttribute="top" constant="1" id="sdu-HL-HDC"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

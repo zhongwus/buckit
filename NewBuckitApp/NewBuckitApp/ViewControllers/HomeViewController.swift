@@ -25,38 +25,54 @@ class HomeViewController: UIViewController {
     
     var challengeViewModel = ChallengeViewModel()
     
-    fileprivate var dataSource: [UIImage] = []
-    
-    //private var challengeViewModel = ChallengeViewModel()
+    fileprivate var dataSource: [(String,UIImage,String,String)] = []  // description, image, challengeId, userId
+    fileprivate var savedChallengeList = [String]() // savedChallengeListId, originalchallengeId
+    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        SideMenuManager.default.menuLeftNavigationController = storyboard!.instantiateViewController(withIdentifier: "leftMenuNavigationController") as? UISideMenuNavigationController
-        SideMenuManager.default.menuPresentMode = .menuSlideIn
-        //SideMenuManager.default.menuAddPanGestureToPresent(toView: self.navigationController!.navigationBar)
-        //SideMenuManager.default.menuAddScreenEdgePanGesturesToPresent(toView: self.navigationController!.view)
-        
-        
+        print("homeviewloaded")
         for challenge in challengeViewModel.challenges! {
             let url = URL(string:challenge.picture!)
             let data = try? Data(contentsOf: url!)
-            dataSource.append(UIImage(data:data!)!)
+            //dataSource.append(UIImage(data:data!)!)
+            dataSource.append(("demo description", UIImage(data:data!)!,"",""))
         }
-        Alamofire.request("http://172.29.92.108:8080/api/challenges") .responseJSON { response in // 1
-            //debugPrint("All Response Info: \(response)")
-            
+        
+        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
             if let data = response.result.value {
-                let json = JSON(data).array
-                print(json?.count)
-                for challenge in json! {
-                    let url = URL(string:challenge["challengeImageLink"].string!)
-                    print(url)
-                    let data = try? Data(contentsOf: url!)
-                    self.dataSource.append(UIImage(data:data!)!)
+                //let json = JSON(data).array
+                let json = JSON(data)["content"]
+                for savedChallenge in json {
+                    self.savedChallengeList.append(savedChallenge.1["challengeId"].string!)
+                }
+                
+                
+            }
+            
+            Alamofire.request("http://10.0.0.192:8080/api/challenges") .responseJSON { response in // 1
+                if let data = response.result.value {
+                    //let json = JSON(data).array
+                    let json = JSON(data)["content"]
+                    
+                    for challenge in json {
+                        let challengeId = challenge.1["id"].string
+                        let userId = challenge.1["userId"].string
+                        if self.savedChallengeList.contains(challengeId!) || self.userId == userId {
+                            continue
+                        }
+                        let url = URL(string: challenge.1["ownerChallengeImageLink"].string!)
+                        let data = try? Data(contentsOf: url!)
+                        let challengeDescription = challenge.1["challengeDescription"].string
+                        self.dataSource.append((challengeDescription!,UIImage(data:data!)!,challengeId!,userId!))
+                        
+                    }
                 }
             }
         }
-
+        
+        
+        
         // Do any additional setup after loading the view.
         crossButton.setImage(UIImage(named:"cross"), for: UIControlState.normal)
         heartButton.setImage(UIImage(named:"heart"), for: UIControlState.normal)
@@ -66,21 +82,6 @@ class HomeViewController: UIViewController {
         
         self.modalTransitionStyle = UIModalTransitionStyle.flipHorizontal
         
-        /*let defaults = UserDefaults.standard
-        if let stringOne = defaults.string(forKey: "last_name") {
-            print(stringOne) // Some String Value
-        }
-        
-        Alamofire.request("https://api.gfycat.com/v1/reactions/populated?tagName=trending") .responseJSON { response in // 1
-            print(response.request)  // original URL request
-            print(response.response) // URL response
-            print(response.data)     // server data
-            print(response.result)   // result of response serialization
-            
-            if let JSON = response.result.value {
-                print("JSON: \(JSON)")
-            }
-        }*/
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -92,6 +93,7 @@ class HomeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    
     @IBAction func testBtnClicked(_ sender: Any) {
         performSegue(withIdentifier: "segue1", sender: nil)
     }
@@ -102,6 +104,7 @@ class HomeViewController: UIViewController {
     @IBAction func likeClicked(_ sender: Any) {
         kolodaView?.swipe(.right)
     }
+    
     
     @IBAction func unwindToHomeViewController(segue:UIStoryboardSegue) {}
     
@@ -135,6 +138,23 @@ extension HomeViewController: KolodaViewDelegate {
         //UIApplication.shared.openURL(URL(string: "https://yalantis.com/")!)
     }
     
+    func koloda(_ koloda: KolodaView, didSwipeCardAt index: Int, in direction: SwipeResultDirection) {
+        print("swiped at index \(index), with direction \(direction)")
+        //self.dataSource[index].0
+        if direction.rawValue == "right" {
+            let challengeId = dataSource[index].2
+            let params : Parameters = ["challengeId":challengeId]
+            Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/savedChallengeList",method:.post, parameters: params,encoding:JSONEncoding.default) .responseString { response in // 1
+                if (response.result.isSuccess) {
+                    print("success")
+                } else {
+                    print("failed")
+                }
+            }
+        }
+
+    }
+    
 }
 
 // MARK: KolodaViewDataSource
@@ -153,11 +173,8 @@ extension HomeViewController: KolodaViewDataSource {
         let albumView = Bundle.main.loadNibNamed("AlbumView", owner: self, options: nil)?[0] as? AlbumView
         albumView?.layer.borderColor = UIColor.gray.cgColor
         albumView?.layer.borderWidth = 1
-        albumView?.photoView.image = dataSource[Int(index)] 
-        albumView?.descriptionView.text = "Hello"
-        //customView.center = self.view.center
-        //customView.addSubview(UIImageView(image:dataSource[Int(index)]))
-        //return UIImageView(image: dataSource[Int(index)])
+        albumView?.photoView.image = dataSource[Int(index)].1
+        albumView?.descriptionView.text = dataSource[Int(index)].0
         return albumView!
     }
     

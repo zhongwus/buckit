@@ -11,7 +11,7 @@
 		394CECEA9F701BC498753D27 /* Pods_NewBuckitAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 368E5F94CCE91BE4A1EB2BA1 /* Pods_NewBuckitAppTests.framework */; };
 		9FBD4C0D8733654C56A9FDAE /* Pods_NewBuckitApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCDFD138CADE145F2CA7275D /* Pods_NewBuckitApp.framework */; };
 		F4385BCF1F96C32900BE9FA8 /* OverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4385BCE1F96C32900BE9FA8 /* OverlayView.xib */; };
-		F43EC52D1F9957670043C96A /* sideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43EC52C1F9957670043C96A /* sideBarViewController.swift */; };
+		F43EC52D1F9957670043C96A /* LeftSideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F43EC52C1F9957670043C96A /* LeftSideBarViewController.swift */; };
 		F45A856C1F901160001A761B /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45A856B1F901160001A761B /* User.swift */; };
 		F45A856E1F90131D001A761B /* UserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F45A856D1F90131D001A761B /* UserViewModel.swift */; };
 		F46691931F8AF9C600FE6E33 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46691921F8AF9C600FE6E33 /* AppDelegate.swift */; };
@@ -28,6 +28,10 @@
 		F4A8F3A01FA6AD7C00BFD785 /* AlbumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */; };
 		F4A8F3A21FA6BDC900BFD785 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */; };
 		F4A8F3A41FA6C87A00BFD785 /* MainContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */; };
+		F4C82CE11FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C82CE01FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift */; };
+		F4EDDC571FA9914D00D2499F /* LeaderboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */; };
+		F4EDDC591FA9989500D2499F /* RightSideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */; };
+		F4EDDC5B1FA9A49F00D2499F /* ChallengeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +61,7 @@
 		DCDFD138CADE145F2CA7275D /* Pods_NewBuckitApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NewBuckitApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA0DE15EAE868B0FFAA894AE /* Pods-NewBuckitAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NewBuckitAppUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-NewBuckitAppUITests/Pods-NewBuckitAppUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F4385BCE1F96C32900BE9FA8 /* OverlayView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OverlayView.xib; sourceTree = "<group>"; };
-		F43EC52C1F9957670043C96A /* sideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sideBarViewController.swift; sourceTree = "<group>"; };
+		F43EC52C1F9957670043C96A /* LeftSideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeftSideBarViewController.swift; sourceTree = "<group>"; };
 		F45A856B1F901160001A761B /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		F45A856D1F90131D001A761B /* UserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserViewModel.swift; sourceTree = "<group>"; };
 		F466918F1F8AF9C600FE6E33 /* NewBuckitApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NewBuckitApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,6 +84,10 @@
 		F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumView.swift; sourceTree = "<group>"; };
 		F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerViewController.swift; sourceTree = "<group>"; };
+		F4C82CE01FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardTableViewCell.swift; sourceTree = "<group>"; };
+		F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
+		F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightSideBarViewController.swift; sourceTree = "<group>"; };
+		F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeDetailViewController.swift; sourceTree = "<group>"; };
 		F87BC1735A493DBC3EC8E020 /* Pods-NewBuckitApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NewBuckitApp.debug.xcconfig"; path = "Pods/Target Support Files/Pods-NewBuckitApp/Pods-NewBuckitApp.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -198,9 +206,12 @@
 				F46691C41F8AFADB00FE6E33 /* HomeViewController.swift */,
 				F46691C61F8B132C00FE6E33 /* CreateChallengeViewController.swift */,
 				F46691CA1F8B563E00FE6E33 /* SelectFriendsViewController.swift */,
-				F43EC52C1F9957670043C96A /* sideBarViewController.swift */,
+				F43EC52C1F9957670043C96A /* LeftSideBarViewController.swift */,
 				F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */,
 				F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */,
+				F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */,
+				F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */,
+				F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -226,6 +237,7 @@
 			children = (
 				F4A8F39B1FA6AB5500BFD785 /* AlbumView.xib */,
 				F4A8F39F1FA6AD7C00BFD785 /* AlbumView.swift */,
+				F4C82CE01FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -476,6 +488,7 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-NewBuckitApp/Pods-NewBuckitApp-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/Cloudinary/Cloudinary.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FacebookCore/FacebookCore.framework",
@@ -489,8 +502,13 @@
 				"${BUILT_PRODUCTS_DIR}/MotionAnimator/MotionAnimator.framework",
 				"${BUILT_PRODUCTS_DIR}/MotionInterchange/MotionInterchange.framework",
 				"${BUILT_PRODUCTS_DIR}/MotionTransitioning/MotionTransitioning.framework",
+				"${BUILT_PRODUCTS_DIR}/RandomKit/RandomKit.framework",
+				"${BUILT_PRODUCTS_DIR}/RxCocoa/RxCocoa.framework",
+				"${BUILT_PRODUCTS_DIR}/RxSwift/RxSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/ShiftOperations/ShiftOperations.framework",
 				"${BUILT_PRODUCTS_DIR}/SideMenu/SideMenu.framework",
 				"${BUILT_PRODUCTS_DIR}/SwiftyJSON/SwiftyJSON.framework",
+				"${BUILT_PRODUCTS_DIR}/Threadly/Threadly.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
 				"${BUILT_PRODUCTS_DIR}/pop/pop.framework",
@@ -499,6 +517,7 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Cloudinary.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FacebookCore.framework",
@@ -512,8 +531,13 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionAnimator.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionInterchange.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/MotionTransitioning.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RandomKit.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxCocoa.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RxSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ShiftOperations.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SideMenu.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwiftyJSON.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Threadly.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/pop.framework",
@@ -564,16 +588,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */,
+				F4EDDC5B1FA9A49F00D2499F /* ChallengeDetailViewController.swift in Sources */,
 				F45A856C1F901160001A761B /* User.swift in Sources */,
 				F4A8F3A21FA6BDC900BFD785 /* ProfileViewController.swift in Sources */,
 				F46691C71F8B132C00FE6E33 /* CreateChallengeViewController.swift in Sources */,
 				F4A8F3A01FA6AD7C00BFD785 /* AlbumView.swift in Sources */,
+				F4C82CE11FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift in Sources */,
 				F46691C31F8AFACF00FE6E33 /* LoginViewController.swift in Sources */,
 				F46691931F8AF9C600FE6E33 /* AppDelegate.swift in Sources */,
 				F45A856E1F90131D001A761B /* UserViewModel.swift in Sources */,
+				F4EDDC591FA9989500D2499F /* RightSideBarViewController.swift in Sources */,
 				F4A8F3A41FA6C87A00BFD785 /* MainContainerViewController.swift in Sources */,
 				F46691C51F8AFADB00FE6E33 /* HomeViewController.swift in Sources */,
-				F43EC52D1F9957670043C96A /* sideBarViewController.swift in Sources */,
+				F4EDDC571FA9914D00D2499F /* LeaderboardViewController.swift in Sources */,
+				F43EC52D1F9957670043C96A /* LeftSideBarViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

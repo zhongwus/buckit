@@ -13,10 +13,14 @@ target 'NewBuckitApp' do
   pod 'Firebase/Auth'
   pod 'Alamofire', '~> 4.5'
   pod 'SwiftyJSON'
+  pod 'RxSwift',    '~> 4.0'
+  pod 'RxCocoa',    '~> 4.0'
   
   pod 'MaterialComponents'
   pod 'Koloda', '~> 4.3.1'
   pod 'SideMenu'
+  pod 'Cloudinary', '~> 2.0'
+  pod 'RandomKit', '~> 5.2.3'
 
 
   # Pods for BuckitTestingWithArchitecture
