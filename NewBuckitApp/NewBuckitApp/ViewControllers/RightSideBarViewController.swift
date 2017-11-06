@@ -16,12 +16,12 @@ class RightSideBarViewController: UIViewController,UITableViewDataSource, UITabl
     
     let cellReuseIdentifier = "cell"
     fileprivate var savedChallengeList = [String]()
-    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
+    fileprivate var userId = "59febace4c638932592030ff"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
+        Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
             if let data = response.result.value {
                 //let json = JSON(data).array
                 let json = JSON(data)["content"]
@@ -63,6 +63,16 @@ class RightSideBarViewController: UIViewController,UITableViewDataSource, UITabl
         
         self.dismiss(animated: false, completion: { })
         performSegue(withIdentifier: "challengeDetailSegue", sender: nil)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        if segue.identifier == "challengeDetailSegue" {
+            let destinationVC = segue.destination as! ChallengeDetailViewController
+            if let indexPath = tableView.indexPathForSelectedRow {
+                destinationVC.challengeId = self.savedChallengeList[indexPath.row]
+            }
+        }
     }
     
 

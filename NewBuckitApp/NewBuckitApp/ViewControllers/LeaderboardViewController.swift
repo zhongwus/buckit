@@ -22,12 +22,13 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
     
     var users: [(String,Int)] = []
     var userInfo = Dictionary<String, Any>()
-    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
+    fileprivate var userId = "59febace4c638932592030ff"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        print("loaded")
         userInfo["numOfFriends"] = ""
-        Alamofire.request("http://10.0.0.192:8080/api/users") .responseJSON { response in // 1
+        Alamofire.request("http://localhost:8080/api/users") .responseJSON { response in // 1
             if let data = response.result.value {
                 //let json = JSON(data).array
                 let json = JSON(data)["content"]
@@ -55,7 +56,7 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
                 
                 self.tableView.reloadData()
                 
-                Alamofire.request("http://10.0.0.192:8080/api/users/\(self.userId)/friends") .responseJSON { response in // 1
+                Alamofire.request("http://localhost:8080/api/users/\(self.userId)/friends") .responseJSON { response in // 1
                     if let data = response.result.value {
                         let json = JSON(data)["content"]
                         self.userInfo["numOfFriends"] = json.count

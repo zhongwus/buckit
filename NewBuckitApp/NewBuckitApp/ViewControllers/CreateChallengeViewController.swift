@@ -16,8 +16,17 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var descriptionText: UITextField!
     
+    var image = UIImage()
+    var text = ""
+    var hasContent = false
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if hasContent {
+            imageView.image = image
+            descriptionText.text = text
+        }
         imageView.layer.borderColor = UIColor.gray.cgColor
         imageView.layer.borderWidth = 1
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(addTapped))
@@ -39,7 +48,7 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
                     let  challengeName =  challengeDescription
                     let  challengeCreatedDate = "2017-09-10"
                     let  challengeType = "funny"
-                    let userId = "59fc0074a85b31a9be4c6cfe"
+                    let userId = "59febace4c638932592030ff"
                     let params: Parameters = [
                             "ownerChallengeImageLink":ownerChallengeImageLink,
                             "challengeDescription":challengeDescription,
@@ -48,8 +57,10 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
                             "challengeName":challengeName
                         ]
                     
-                    Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                    Alamofire.request("http://localhost:8080/api/users/\(userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                        print(response)
                         if (response.result.isSuccess) {
+                            self.performSegue(withIdentifier: "friendSelectionSegue", sender: self)
                         } else {
                             print("upload failed!")
                         }
@@ -108,11 +119,7 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
-    
-    @IBAction func donePickingImage(_ sender: Any) {
-        performSegue(withIdentifier: "segue2", sender: nil)
-    }
-    
+
     /*@IBAction func nextClicked(_ sender: Any) {
         //performSegue(withIdentifier: "segue2", sender: nil)
         let config = CLDConfiguration(cloudName: "sem", apiKey: "445234287149499")

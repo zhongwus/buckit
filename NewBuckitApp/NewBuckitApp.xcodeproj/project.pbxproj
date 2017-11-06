@@ -29,6 +29,7 @@
 		F4A8F3A21FA6BDC900BFD785 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */; };
 		F4A8F3A41FA6C87A00BFD785 /* MainContainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */; };
 		F4C82CE11FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C82CE01FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift */; };
+		F4C82CE31FAEF35900A208A1 /* EditProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4C82CE21FAEF35900A208A1 /* EditProfileViewController.swift */; };
 		F4EDDC571FA9914D00D2499F /* LeaderboardViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */; };
 		F4EDDC591FA9989500D2499F /* RightSideBarViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */; };
 		F4EDDC5B1FA9A49F00D2499F /* ChallengeDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */; };
@@ -85,6 +86,7 @@
 		F4A8F3A11FA6BDC900BFD785 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		F4A8F3A31FA6C87A00BFD785 /* MainContainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerViewController.swift; sourceTree = "<group>"; };
 		F4C82CE01FAEBF6B00A208A1 /* LeaderboardTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardTableViewCell.swift; sourceTree = "<group>"; };
+		F4C82CE21FAEF35900A208A1 /* EditProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileViewController.swift; sourceTree = "<group>"; };
 		F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardViewController.swift; sourceTree = "<group>"; };
 		F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RightSideBarViewController.swift; sourceTree = "<group>"; };
 		F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeDetailViewController.swift; sourceTree = "<group>"; };
@@ -212,6 +214,7 @@
 				F4EDDC561FA9914D00D2499F /* LeaderboardViewController.swift */,
 				F4EDDC581FA9989500D2499F /* RightSideBarViewController.swift */,
 				F4EDDC5A1FA9A49F00D2499F /* ChallengeDetailViewController.swift */,
+				F4C82CE21FAEF35900A208A1 /* EditProfileViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -587,6 +590,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F4C82CE31FAEF35900A208A1 /* EditProfileViewController.swift in Sources */,
 				F46691CB1F8B563E00FE6E33 /* SelectFriendsViewController.swift in Sources */,
 				F4EDDC5B1FA9A49F00D2499F /* ChallengeDetailViewController.swift in Sources */,
 				F45A856C1F901160001A761B /* User.swift in Sources */,

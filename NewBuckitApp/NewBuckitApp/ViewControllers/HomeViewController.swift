@@ -19,15 +19,15 @@ class HomeViewController: UIViewController {
 
     @IBOutlet weak var kolodaView: KolodaView!
     
-    @IBOutlet var TestButton: UIButton!
     @IBOutlet var crossButton: UIButton!
     @IBOutlet var heartButton: UIButton!
     
     var challengeViewModel = ChallengeViewModel()
+    var currentCardIndex = 0
     
     fileprivate var dataSource: [(String,UIImage,String,String)] = []  // description, image, challengeId, userId
     fileprivate var savedChallengeList = [String]() // savedChallengeListId, originalchallengeId
-    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
+    fileprivate var userId = "59febace4c638932592030ff"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +39,7 @@ class HomeViewController: UIViewController {
             dataSource.append(("demo description", UIImage(data:data!)!,"",""))
         }
         
-        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
+        Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
             if let data = response.result.value {
                 //let json = JSON(data).array
                 let json = JSON(data)["content"]
@@ -50,7 +50,7 @@ class HomeViewController: UIViewController {
                 
             }
             
-            Alamofire.request("http://10.0.0.192:8080/api/challenges") .responseJSON { response in // 1
+            Alamofire.request("http://localhost:8080/api/challenges") .responseJSON { response in // 1
                 if let data = response.result.value {
                     //let json = JSON(data).array
                     let json = JSON(data)["content"]
@@ -93,10 +93,15 @@ class HomeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    
-    @IBAction func testBtnClicked(_ sender: Any) {
-        performSegue(withIdentifier: "segue1", sender: nil)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! CreateChallengeViewController
+        if segue.identifier == "challengeSegue" {
+            destinationVC.hasContent = true
+            destinationVC.image = dataSource[currentCardIndex].1
+            destinationVC.text = dataSource[currentCardIndex].0
+        }
     }
+    
     
     @IBAction func dislikeClicked(_ sender: Any) {
         kolodaView?.swipe(.left)
@@ -140,11 +145,12 @@ extension HomeViewController: KolodaViewDelegate {
     
     func koloda(_ koloda: KolodaView, didSwipeCardAt index: Int, in direction: SwipeResultDirection) {
         print("swiped at index \(index), with direction \(direction)")
+        currentCardIndex += 1
         //self.dataSource[index].0
         if direction.rawValue == "right" {
             let challengeId = dataSource[index].2
             let params : Parameters = ["challengeId":challengeId]
-            Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)/savedChallengeList",method:.post, parameters: params,encoding:JSONEncoding.default) .responseString { response in // 1
+            Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList",method:.post, parameters: params,encoding:JSONEncoding.default) .responseString { response in // 1
                 if (response.result.isSuccess) {
                     print("success")
                 } else {

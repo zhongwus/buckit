@@ -7,18 +7,54 @@
 //
 
 import UIKit
+import Alamofire
+import SwiftyJSON
 
 class ChallengeDetailViewController: UIViewController {
-
+    
+    var challengeId = ""
+    var challenge = Dictionary<String, Any>()
+    @IBOutlet var challengeAlbumView: UIView!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
+        Alamofire.request("http://localhost:8080/api/challenges/\(challengeId)").responseJSON { response in
+            if let data = response.result.value {
+                self.challenge = JSON(data)["content"].dictionaryObject!
+                Alamofire.request(self.challenge["ownerChallengeImageLink"] as! String).responseJSON { response in
+                     //self.avatarImage.setImage(UIImage(data: response.data!, scale:1), for: .normal)
+                    let albumView = Bundle.main.loadNibNamed("AlbumView", owner: self, options: nil)?[0] as? AlbumView
+                    albumView?.layer.borderColor = UIColor.gray.cgColor
+                    albumView?.layer.borderWidth = 1
+                    albumView?.photoView.image = UIImage(data: response.data!, scale:1)
+                    self.challenge["image"] = UIImage(data: response.data!, scale:1)
+                    albumView?.descriptionView.text = self.challenge["challengeDescription"] as? String
+                    albumView?.frame = self.challengeAlbumView.bounds
+                    albumView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+                    self.challengeAlbumView.addSubview(albumView!)
+                }
+            }
+        }
+        
+        /*albumView?.photoView.image = dataSource[Int(index)].1
+        albumView?.descriptionView.text = dataSource[Int(index)].0*/
         // Do any additional setup after loading the view.
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let destinationVC = segue.destination as! CreateChallengeViewController
+        if segue.identifier == "challengeSegue1" {
+            destinationVC.hasContent = true
+            print(self.challenge)
+            destinationVC.image = self.challenge["image"] as! UIImage
+            destinationVC.text = self.challenge["challengeDescription"] as! String
+        }
     }
     
 

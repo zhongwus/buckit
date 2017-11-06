@@ -18,7 +18,7 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
     @IBOutlet var tableView: UITableView!
     @IBOutlet var sidebarNameLabel: UILabel!
     
-    fileprivate var userId = "59fe787ad5620f18b97c5a6e"
+    fileprivate var userId = "59febace4c638932592030ff"
     let defaults = UserDefaults.standard
     let hamburgerMenuTitle: [String] = ["Home", "Leaderboard", "Log out"]
     let cellReuseIdentifier = "cell"
@@ -31,7 +31,7 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
         avatarImage.layer.cornerRadius = avatarImage.frame.height/2
         avatarImage.clipsToBounds = true
         
-        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)") .responseJSON { response in // 1
+        Alamofire.request("http://localhost:8080/api/users/\(userId)") .responseJSON { response in // 1
             if let data = response.result.value {
                 let json = JSON(data)["content"]
                 self.sidebarNameLabel.text = json["firstName"].string! + " " + json["lastName"].string!
