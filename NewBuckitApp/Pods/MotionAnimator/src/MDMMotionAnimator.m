@@ -18,30 +18,22 @@
 
 #import <UIKit/UIKit.h>
 
-#if TARGET_IPHONE_SIMULATOR
-UIKIT_EXTERN float UIAnimationDragCoefficient(void); // UIKit private drag coefficient.
-#endif
-
-static CGFloat simulatorAnimationDragCoefficient(void) {
-#if TARGET_IPHONE_SIMULATOR
-  return UIAnimationDragCoefficient();
-#else
-  return 1.0;
-#endif
-}
-
-static CAMediaTimingFunction* timingFunctionWithControlPoints(CGFloat controlPoints[4]);
-static NSArray* coerceUIKitValuesToCoreAnimationValues(NSArray *values);
-static CABasicAnimation *animationFromTiming(MDMMotionTiming timing, CGFloat timeScaleFactor);
-static void makeAnimationAdditive(CABasicAnimation *animation);
+#import "CATransaction+MotionAnimator.h"
+#import "private/CABasicAnimation+MotionAnimator.h"
+#import "private/MDMAnimationRegistrar.h"
+#import "private/MDMUIKitValueCoercion.h"
+#import "private/MDMBlockAnimations.h"
+#import "private/MDMDragCoefficient.h"
 
 @implementation MDMMotionAnimator {
   NSMutableArray *_tracers;
+  MDMAnimationRegistrar *_registrar;
 }
 
 - (instancetype)init {
   self = [super init];
   if (self) {
+    _registrar = [[MDMAnimationRegistrar alloc] init];
     _timeScaleFactor = 1;
     _additive = true;
   }
@@ -65,7 +57,7 @@ static void makeAnimationAdditive(CABasicAnimation *animation);
   if (_shouldReverseValues) {
     values = [[values reverseObjectEnumerator] allObjects];
   }
-  values = coerceUIKitValuesToCoreAnimationValues(values);
+  values = MDMCoerceUIKitValuesToCoreAnimationValues(values);
 
   if (timing.duration == 0 || timing.curve.type == MDMMotionCurveTypeInstant) {
     [layer setValue:[values lastObject] forKeyPath:keyPath];
@@ -75,8 +67,8 @@ static void makeAnimationAdditive(CABasicAnimation *animation);
     return;
   }
 
-  CGFloat timeScaleFactor = simulatorAnimationDragCoefficient() * _timeScaleFactor;
-  CABasicAnimation *animation = animationFromTiming(timing, timeScaleFactor);
+  CGFloat timeScaleFactor = [self computedTimeScaleFactor];
+  CABasicAnimation *animation = MDMAnimationFromTiming(timing, timeScaleFactor);
 
   if (animation) {
     animation.keyPath = keyPath;
@@ -96,9 +88,7 @@ static void makeAnimationAdditive(CABasicAnimation *animation);
     animation.toValue = [values lastObject];
 
     if (![animation.fromValue isEqual:animation.toValue]) {
-      if (self.additive) {
-        makeAnimationAdditive(animation);
-      }
+      MDMConfigureAnimation(animation, self.additive, timing);
 
       if (timing.delay != 0) {
         animation.beginTime = ([layer convertTime:CACurrentMediaTime() fromLayer:nil]
@@ -106,26 +96,42 @@ static void makeAnimationAdditive(CABasicAnimation *animation);
         animation.fillMode = kCAFillModeBackwards;
       }
 
-      if (completion) {
-        [CATransaction begin];
-        [CATransaction setCompletionBlock:completion];
-      }
-
-      // When we use a nil key, Core Animation will ensure that the animation is added with a
-      // unique key - this enables our additive animations to stack upon one another.
-      [layer addAnimation:animation forKey:nil];
+      NSString *key = _additive ? nil : keyPath;
+      [_registrar addAnimation:animation toLayer:layer forKey:key completion:completion];
 
       for (void (^tracer)(CALayer *, CAAnimation *) in _tracers) {
         tracer(layer, animation);
       }
-
-      if (completion) {
-        [CATransaction commit];
-      }
     }
   }
 
+  [CATransaction begin];
+  [CATransaction setDisableActions:YES];
   [layer setValue:[values lastObject] forKeyPath:keyPath];
+  [CATransaction commit];
+}
+
+- (void)animateWithTiming:(MDMMotionTiming)timing animations:(void (^)(void))animations {
+  [self animateWithTiming:timing animations:animations completion:nil];
+}
+
+- (void)animateWithTiming:(MDMMotionTiming)timing
+               animations:(void (^)(void))animations
+               completion:(void(^)(void))completion {
+  NSArray<MDMImplicitAction *> *actions = MDMAnimateImplicitly(animations);
+
+  [CATransaction begin];
+  [CATransaction setCompletionBlock:completion];
+
+  for (MDMImplicitAction *action in actions) {
+    id currentValue = [action.layer valueForKeyPath:action.keyPath];
+    [self animateWithTiming:timing
+                    toLayer:action.layer
+                 withValues:@[action.initialValue, currentValue]
+                    keyPath:action.keyPath];
+  }
+
+  [CATransaction commit];
 }
 
 - (void)addCoreAnimationTracer:(void (^)(CALayer *, CAAnimation *))tracer {
@@ -135,98 +141,29 @@ static void makeAnimationAdditive(CABasicAnimation *animation);
   [_tracers addObject:[tracer copy]];
 }
 
+- (CGFloat)computedTimeScaleFactor {
+  CGFloat timeScaleFactor;
+  id transactionTimeScaleFactor = [CATransaction mdm_timeScaleFactor];
+  if (transactionTimeScaleFactor != nil) {
+#if CGFLOAT_IS_DOUBLE
+    timeScaleFactor = [transactionTimeScaleFactor doubleValue];
+#else
+    timeScaleFactor = [transactionTimeScaleFactor floatValue];
+#endif
+  } else {
+    timeScaleFactor = _timeScaleFactor;
+  }
+
+  return MDMSimulatorAnimationDragCoefficient() * timeScaleFactor;
+}
+
+- (void)removeAllAnimations {
+  [_registrar removeAllAnimations];
+}
+
+- (void)stopAllAnimations {
+  [_registrar commitCurrentAnimationValuesToAllLayers];
+  [_registrar removeAllAnimations];
+}
+
 @end
-
-static CAMediaTimingFunction* timingFunctionWithControlPoints(CGFloat controlPoints[4]) {
-  return [CAMediaTimingFunction functionWithControlPoints:(float)controlPoints[0]
-                                                         :(float)controlPoints[1]
-                                                         :(float)controlPoints[2]
-                                                         :(float)controlPoints[3]];
-}
-
-static NSArray* coerceUIKitValuesToCoreAnimationValues(NSArray *values) {
-  if ([[values firstObject] isKindOfClass:[UIColor class]]) {
-    NSMutableArray *convertedArray = [NSMutableArray arrayWithCapacity:values.count];
-    for (UIColor *color in values) {
-      [convertedArray addObject:(id)color.CGColor];
-    }
-    values = convertedArray;
-
-  } else if ([[values firstObject] isKindOfClass:[UIBezierPath class]]) {
-    NSMutableArray *convertedArray = [NSMutableArray arrayWithCapacity:values.count];
-    for (UIBezierPath *bezierPath in values) {
-      [convertedArray addObject:(id)bezierPath.CGPath];
-    }
-    values = convertedArray;
-  }
-  return values;
-}
-
-static CABasicAnimation *animationFromTiming(MDMMotionTiming timing, CGFloat timeScaleFactor) {
-  CABasicAnimation *animation;
-  switch (timing.curve.type) {
-    case MDMMotionCurveTypeInstant:
-      animation = nil;
-      break;
-
-    case MDMMotionCurveTypeDefault:
-    case MDMMotionCurveTypeBezier:
-      animation = [CABasicAnimation animation];
-      animation.timingFunction = timingFunctionWithControlPoints(timing.curve.data);
-      animation.duration = timing.duration * timeScaleFactor;
-      break;
-
-    case MDMMotionCurveTypeSpring: {
-      CASpringAnimation *spring = [CASpringAnimation animation];
-      spring.mass = timing.curve.data[MDMSpringMotionCurveDataIndexMass];
-      spring.stiffness = timing.curve.data[MDMSpringMotionCurveDataIndexTension];
-      spring.damping = timing.curve.data[MDMSpringMotionCurveDataIndexFriction];
-      if ([spring respondsToSelector:@selector(settlingDuration)]) {
-        spring.duration = spring.settlingDuration;
-      } else {
-        spring.duration = timing.duration;
-      }
-      animation = spring;
-      break;
-    }
-  }
-  return animation;
-}
-
-static void makeAnimationAdditive(CABasicAnimation *animation) {
-  static NSSet *sizeKeyPaths = nil;
-  static NSSet *positionKeyPaths = nil;
-  static dispatch_once_t onceToken;
-  dispatch_once(&onceToken, ^{
-    sizeKeyPaths = [NSSet setWithArray:@[@"bounds.size"]];
-
-    positionKeyPaths = [NSSet setWithArray:@[@"position",
-                                             @"anchorPoint"]];
-  });
-
-  if ([animation.toValue isKindOfClass:[NSNumber class]]) {
-    CGFloat currentValue = (CGFloat)[animation.fromValue doubleValue];
-    CGFloat delta = currentValue - (CGFloat)[animation.toValue doubleValue];
-    animation.fromValue = @(delta);
-    animation.toValue = @0;
-    animation.additive = true;
-
-  } else if ([sizeKeyPaths containsObject:animation.keyPath]) {
-    CGSize currentValue = [animation.fromValue CGSizeValue];
-    CGSize destinationValue = [animation.toValue CGSizeValue];
-    CGSize delta = CGSizeMake(currentValue.width - destinationValue.width,
-                              currentValue.height - destinationValue.height);
-    animation.fromValue = [NSValue valueWithCGSize:delta];
-    animation.toValue = [NSValue valueWithCGSize:CGSizeZero];
-    animation.additive = true;
-
-  } else if ([positionKeyPaths containsObject:animation.keyPath]) {
-    CGPoint currentValue = [animation.fromValue CGPointValue];
-    CGPoint destinationValue = [animation.toValue CGPointValue];
-    CGPoint delta = CGPointMake(currentValue.x - destinationValue.x,
-                                currentValue.y - destinationValue.y);
-    animation.fromValue = [NSValue valueWithCGPoint:delta];
-    animation.toValue = [NSValue valueWithCGPoint:CGPointZero];
-    animation.additive = true;
-  }
-}

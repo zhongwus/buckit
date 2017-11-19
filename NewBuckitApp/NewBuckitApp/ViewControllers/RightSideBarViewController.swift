@@ -15,18 +15,17 @@ class RightSideBarViewController: UIViewController,UITableViewDataSource, UITabl
     @IBOutlet var tableView: UITableView!
     
     let cellReuseIdentifier = "cell"
-    fileprivate var savedChallengeList = [String]()
-    fileprivate var userId = "59febace4c638932592030ff"
+    fileprivate var savedChallengeList = [[String]]()
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
             if let data = response.result.value {
-                //let json = JSON(data).array
                 let json = JSON(data)["content"]
                 for savedChallenge in json {
-                    self.savedChallengeList.append(savedChallenge.1["challengeId"].string!)
+                    self.savedChallengeList.append([savedChallenge.1["challengeId"].string!,savedChallenge.1["challengeName"].string!])
                 }
                 self.tableView.reloadData()
                 
@@ -52,7 +51,7 @@ class RightSideBarViewController: UIViewController,UITableViewDataSource, UITabl
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
-        cell.textLabel?.text = self.savedChallengeList[indexPath.row]
+        cell.textLabel?.text = self.savedChallengeList[indexPath.row][1]
         cell.backgroundColor = UIColor.black
         cell.textLabel?.textColor = UIColor.white
         
@@ -70,7 +69,7 @@ class RightSideBarViewController: UIViewController,UITableViewDataSource, UITabl
         if segue.identifier == "challengeDetailSegue" {
             let destinationVC = segue.destination as! ChallengeDetailViewController
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.challengeId = self.savedChallengeList[indexPath.row]
+                destinationVC.challengeId = self.savedChallengeList[indexPath.row][0]
             }
         }
     }

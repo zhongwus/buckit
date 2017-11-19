@@ -8,6 +8,7 @@
 
 import UIKit
 import FBSDKLoginKit
+import FacebookCore
 import SideMenu
 import Alamofire
 import SwiftyJSON
@@ -18,7 +19,7 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
     @IBOutlet var tableView: UITableView!
     @IBOutlet var sidebarNameLabel: UILabel!
     
-    fileprivate var userId = "59febace4c638932592030ff"
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     let defaults = UserDefaults.standard
     let hamburgerMenuTitle: [String] = ["Home", "Leaderboard", "Log out"]
     let cellReuseIdentifier = "cell"
@@ -31,15 +32,11 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
         avatarImage.layer.cornerRadius = avatarImage.frame.height/2
         avatarImage.clipsToBounds = true
         
-        Alamofire.request("http://localhost:8080/api/users/\(userId)") .responseJSON { response in // 1
-            if let data = response.result.value {
-                let json = JSON(data)["content"]
-                self.sidebarNameLabel.text = json["firstName"].string! + " " + json["lastName"].string!
-                Alamofire.request(json["profilePictureLink"].string!).response { response in
-                   
-                    self.avatarImage.setImage(UIImage(data: response.data!, scale:1), for: .normal)
-                }
-            }
+        sidebarNameLabel.text = UserDefaults.standard.string(forKey: "first_name")! + " " + UserDefaults.standard.string(forKey: "last_name")!
+        
+        Alamofire.request(UserDefaults.standard.string(forKey: "profilePictureLink") ?? "").response { response in
+            
+            self.avatarImage.setImage(UIImage(data: response.data!, scale:1), for: .normal)
         }
         
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellReuseIdentifier)
@@ -59,11 +56,11 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
         if (cell?.textLabel?.text == "Log out") {
             let loginManager = FBSDKLoginManager()
             loginManager.logOut()
+            UserDefaults.standard.removeObject(forKey: "userId")
             let storyboard = UIStoryboard(name:"Main",bundle:nil)
-            let loginController = storyboard.instantiateViewController(withIdentifier: "loginViewController")
-            
-            self.view.window?.rootViewController?.dismiss(animated: false, completion: {})
-            self.view.window?.rootViewController = loginController
+            let loginController = storyboard.instantiateViewController(withIdentifier: "loginViewController") 
+            let appDelegate = UIApplication.shared.delegate as! AppDelegate
+            appDelegate.window?.rootViewController = loginController
         } else if (cell?.textLabel?.text == "Home") {
             self.dismiss(animated: true, completion: {
                 self.defaults.set("home", forKey: "pageName")
@@ -78,12 +75,6 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell:UITableViewCell = self.tableView.dequeueReusableCell(withIdentifier: cellReuseIdentifier)!
         cell.textLabel?.text = self.hamburgerMenuTitle[indexPath.row]
-        /*switch self.hamburgerMenuTitle[indexPath.row] {
-        case "Home":
-            cell.imageView?.image = UIImage(named:"hamburger")
-        default:
-            cell.imageView?.image = UIImage(named:"heart")
-        }*/
         return cell
     }
     

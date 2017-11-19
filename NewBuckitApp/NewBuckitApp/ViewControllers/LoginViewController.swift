@@ -37,10 +37,10 @@ class LoginViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    
     @objc func loginButtonClicked() {
-        print("starting...")
+        
         let loginManager = LoginManager()
-
         loginManager.logIn(readPermissions: [ .email, .publicProfile ], viewController: self) { loginResult in
             switch loginResult {
             case .failed(let error):
@@ -60,30 +60,27 @@ class LoginViewController: UIViewController {
                     else
                     {
                         let json = JSON(result)
-                        print(json)
-                        let defaults = UserDefaults.standard
-                        defaults.set(json["first_name"].string, forKey: "first_name")
-                        defaults.set(json["last_name"].string, forKey: "last_name")
-                        defaults.set(json["email"].string, forKey: "email")
-                        defaults.set(json["picture"]["data"]["url"].string, forKey: "avatarURL")
-                        let params: Parameters = ["firstName":json["first_name"].string,"lastName":json["first_name"].string,"emailAddress":json["email"].string,"score":0,"profilePictureLink":json["picture"]["data"]["url"].string]
+                        let params: Parameters = ["firstName":json["first_name"].string,"lastName":json["last_name"].string,"emailAddress":json["email"].string,"score":0,"profilePictureLink":json["picture"]["data"]["url"].string]
 
-                        /*Alamofire.request("http://10.0.0.105:8080/api/users/",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
                             if (response.result.isSuccess) {
-                                let storyboard = UIStoryboard(name:"Main",bundle:nil)
-                                let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
-                                mainNavigationController.modalTransitionStyle = .flipHorizontal
-                                self.present(mainNavigationController, animated: true, completion: nil)
+                                if let id = response.result.value {
+                                    let defaults = UserDefaults.standard
+                                    defaults.set(id, forKey: "userId")
+                                    defaults.set(json["first_name"].string,forKey:"first_name")
+                                    defaults.set(json["last_name"].string,forKey:"last_name")
+                                    defaults.set(json["email"].string,forKey:"email")
+                                    defaults.set(json["picture"]["data"]["url"].string,forKey:"profilePictureLink")
+                                     let storyboard = UIStoryboard(name:"Main",bundle:nil)
+                                     let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
+                                     mainNavigationController.modalTransitionStyle = .flipHorizontal
+                                     let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                                     appDelegate.window?.rootViewController = mainNavigationController
+                                }
                             } else {
                              print("Login Failed")
                             }
-                        }*/
-                        let storyboard = UIStoryboard(name:"Main",bundle:nil)
-                        let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
-                        mainNavigationController.modalTransitionStyle = .flipHorizontal
-                        self.present(mainNavigationController, animated: true, completion: nil)
-                        
-                        
+                        }
                     }
                 })
             }

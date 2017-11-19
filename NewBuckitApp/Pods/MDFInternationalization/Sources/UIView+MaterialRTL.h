@@ -23,7 +23,15 @@
  `+[UIView userInterfaceLayoutDirectionForSemanticContentAttribute:relativeToLayoutDirection:]`.
  */
 
+
+
 @interface UIView (MaterialRTL)
+
+// UISemanticContentAttribute was added in iOS SDK 9.0 but is available on devices running earlier
+// version of iOS. We ignore the partial-availability warning that gets thrown on our use of this
+// symbol.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
 
 /**
  A semantic description of the view's contents, used to determine whether the view should be flipped
@@ -52,7 +60,8 @@
 /**
  Returns the layout direction implied by the provided semantic content attribute relative to the
  application-wide layout direction (as returned by
- UIApplication.sharedApplication.userInterfaceLayoutDirection).
+ UIApplication.sharedApplication.userInterfaceLayoutDirection). However, if it's being called from
+ an iOS 8 extension, it will return left-to-right every time.
 
  @param semanticContentAttribute The semantic content attribute.
  @return The layout direction.
@@ -76,5 +85,7 @@
         (UISemanticContentAttribute)semanticContentAttribute
                                       relativeToLayoutDirection:
                                           (UIUserInterfaceLayoutDirection)layoutDirection;
+
+#pragma clang diagnostic pop
 
 @end

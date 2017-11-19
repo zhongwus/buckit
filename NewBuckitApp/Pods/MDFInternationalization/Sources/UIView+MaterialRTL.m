@@ -21,6 +21,12 @@
 #define MDF_BASE_SDK_EQUAL_OR_ABOVE(x) \
   (defined(__IPHONE_##x) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_##x))
 
+// UISemanticContentAttribute was added in iOS SDK 9.0 but is available on devices running earlier
+// version of iOS. We ignore the partial-availability warning that gets thrown on our use of this
+// symbol.
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+
 static inline UIUserInterfaceLayoutDirection
     MDFUserInterfaceLayoutDirectionForSemanticContentAttributeRelativeToLayoutDirection(
         UISemanticContentAttribute semanticContentAttribute,
@@ -99,8 +105,7 @@ static inline UIUserInterfaceLayoutDirection
 #endif  // MDF_BASE_SDK_EQUAL_OR_ABOVE(9_0)
   {
     // If we are running in the context of an app, we query [UIApplication sharedApplication].
-    // Otherwise use a default of Left-to-Right, as UIKit in iOS 8 and below doesn't support native
-    // RTL layout.
+    // Otherwise use a default of Left-to-Right.
     UIUserInterfaceLayoutDirection applicationLayoutDirection =
         UIUserInterfaceLayoutDirectionLeftToRight;
     NSString *bundlePath = [[NSBundle mainBundle] bundlePath];
@@ -145,7 +150,7 @@ static inline UIUserInterfaceLayoutDirection
 - (UISemanticContentAttribute)mdf_associatedSemanticContentAttribute {
   NSNumber *semanticContentAttributeNumber =
       objc_getAssociatedObject(self, @selector(mdf_semanticContentAttribute));
-  if (semanticContentAttributeNumber) {
+  if (semanticContentAttributeNumber != nil) {
     return [semanticContentAttributeNumber integerValue];
   }
   return UISemanticContentAttributeUnspecified;
@@ -158,3 +163,5 @@ static inline UIUserInterfaceLayoutDirection
 }
 
 @end
+
+#pragma clang diagnostic pop

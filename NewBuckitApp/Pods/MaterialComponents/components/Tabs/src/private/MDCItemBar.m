@@ -18,8 +18,8 @@
 
 #import "MDCItemBarCell.h"
 #import "MDCItemBarStyle.h"
+#import "MDFInternationalization.h"
 #import "MaterialAnimationTiming.h"
-#import "MaterialRTL.h"
 
 /// Height in points of the bar shown under selected items.
 static const CGFloat kSelectionIndicatorHeight = 2.0f;
@@ -71,8 +71,8 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   /// Size of the view at last layout, for deduplicating changes.
   CGSize _lastSize;
 
-  /// Horizontal size class at the last item metrics update. Used to calculate deltas.
-  UIUserInterfaceSizeClass _horizontalSizeClassAtLastMetricsUpdate;
+  /// Width of the collection view accounting for SafeAreaInsets at last layout.
+  CGFloat _lastAdjustedCollectionViewWidth;
 
   /// Current style properties.
   MDCItemBarStyle *_style;
@@ -102,21 +102,26 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   _alignment = MDCItemBarAlignmentLeading;
   _style = [[MDCItemBarStyle alloc] init];
   _items = @[];
-  _horizontalSizeClassAtLastMetricsUpdate = UIUserInterfaceSizeClassUnspecified;
 
   // Configure the collection view.
   _flowLayout = [self generatedFlowLayout];
   UICollectionView *collectionView =
       [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:_flowLayout];
   collectionView.backgroundColor = [UIColor clearColor];
-  collectionView.clipsToBounds = YES;
+  collectionView.clipsToBounds = NO;
   collectionView.scrollsToTop = NO;
   collectionView.showsHorizontalScrollIndicator = NO;
   collectionView.showsVerticalScrollIndicator = NO;
+
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    collectionView.contentInsetAdjustmentBehavior =
+        UIScrollViewContentInsetAdjustmentScrollableAxes;
+  }
+#endif
+
   collectionView.dataSource = self;
   collectionView.delegate = self;
-  collectionView.autoresizingMask =
-      UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
   [collectionView registerClass:[MDCItemBarCell class] forCellWithReuseIdentifier:kItemReuseID];
 
   _collectionView = collectionView;
@@ -275,13 +280,15 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   _collectionView.frame = bounds;
 
   // Update collection metrics if the size has changed.
-  if (!CGSizeEqualToSize(bounds.size, _lastSize)) {
+  if (!CGSizeEqualToSize(bounds.size, _lastSize) ||
+      [self adjustedCollectionViewWidth] != _lastAdjustedCollectionViewWidth) {
     [self updateFlowLayoutMetrics];
 
     // Ensure selected item is aligned properly on resize.
     [self selectItemAtIndex:[self indexForItem:_selectedItem] animated:NO];
   }
   _lastSize = bounds.size;
+  _lastAdjustedCollectionViewWidth = [self adjustedCollectionViewWidth];
 }
 
 - (CGSize)sizeThatFits:(CGSize)size {
@@ -291,6 +298,15 @@ static void *kItemPropertyContext = &kItemPropertyContext;
 
 - (CGSize)intrinsicContentSize {
   return CGSizeMake(UIViewNoIntrinsicMetric, [[self class] defaultHeightForStyle:_style]);
+}
+
+- (void)safeAreaInsetsDidChange {
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    [super safeAreaInsetsDidChange];
+  }
+#endif
+  [self setNeedsLayout];
 }
 
 - (void)didMoveToWindow {
@@ -394,7 +410,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   // Divide justified items evenly across the view.
   if (_alignment == MDCItemBarAlignmentJustified) {
     NSInteger count = [self collectionView:_collectionView numberOfItemsInSection:0];
-    size.width = _collectionView.bounds.size.width / MAX(count, 1);
+    size.width = [self adjustedCollectionViewWidth] / MAX(count, 1);
   }
 
   // Constrain to style-based width if necessary.
@@ -403,15 +419,24 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   }
 
   // Constrain to view width
-  size.width = MIN(size.width, CGRectGetWidth(collectionView.frame));
+  size.width = MIN(size.width, [self adjustedCollectionViewWidth]);
 
   // Force height to our height.
   size.height = itemHeight;
-
   return size;
 }
 
 #pragma mark - Private
+
+- (CGFloat)adjustedCollectionViewWidth {
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    return CGRectGetWidth(UIEdgeInsetsInsetRect(_collectionView.bounds,
+                                                _collectionView.adjustedContentInset));
+  }
+#endif
+  return CGRectGetWidth(_collectionView.bounds);
+}
 
 + (NSArray *)observableItemKeys {
   static dispatch_once_t onceToken;
@@ -603,14 +628,6 @@ static void *kItemPropertyContext = &kItemPropertyContext;
       break;
   }
 
-  UIEdgeInsets oldSectionInset = _flowLayout.sectionInset;
-  if (UIEdgeInsetsEqualToEdgeInsets(oldSectionInset, newSectionInset) &&
-      _alignment != MDCItemBarAlignmentJustified) {
-    // No change - can bail early, except when the item alignment is "justified". When justified,
-    // the layout metrics need updating due to change in view size or orientation.
-    return;
-  }
-
   // Rather than just updating the sectionInset on the existing flowLayout, a new layout object
   // is created. This gives more control over whether the change is animated or not - as there is
   // no control when updating flow layout sectionInset (it's always animated).
@@ -627,29 +644,35 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   // Update selection indicator to potentially new location and size
   // Not animated for the same reason as mentioned above.
   [self updateSelectionIndicatorToIndex:[self indexForItem:_selectedItem]];
-
-  _horizontalSizeClassAtLastMetricsUpdate = horizontalSizeClass;
 }
 
 - (UIEdgeInsets)leadingAlignedInsetsForHorizontalSizeClass:(UIUserInterfaceSizeClass)sizeClass {
   const BOOL isRegular = (sizeClass == UIUserInterfaceSizeClassRegular);
-  const CGFloat inset = isRegular ? kRegularInset : kCompactInset;
+  CGFloat inset = isRegular ? kRegularInset : kCompactInset;
+  // If the collection view has Safe Area insets, we don't want to add an extra horizontal inset.
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    if (_collectionView.safeAreaInsets.left > 0 || _collectionView.safeAreaInsets.right > 0) {
+      inset = 0;
+    }
+  }
+#endif
   return UIEdgeInsetsMake(0.0f, inset, 0.0f, inset);
 }
 
 - (UIEdgeInsets)justifiedInsets {
   // Center items, which will be at most the width of the view.
   CGFloat itemWidths = [self totalWidthOfAllItems];
-  CGFloat sideInsets = floorf((float)(_collectionView.bounds.size.width - itemWidths) / 2.0f);
+  CGFloat sideInsets = floorf((float)([self adjustedCollectionViewWidth] - itemWidths) / 2.0f);
   return UIEdgeInsetsMake(0.0, sideInsets, 0.0, sideInsets);
 }
 
 - (UIEdgeInsets)centeredInsetsForHorizontalSizeClass:(UIUserInterfaceSizeClass)sizeClass {
   CGFloat itemWidths = [self totalWidthOfAllItems];
-  CGFloat viewWidth = _collectionView.bounds.size.width;
+  CGFloat viewWidth = [self adjustedCollectionViewWidth];
   UIEdgeInsets insets = [self leadingAlignedInsetsForHorizontalSizeClass:sizeClass];
   if (itemWidths <= (viewWidth - insets.left - insets.right)) {
-    CGFloat sideInsets = (_collectionView.bounds.size.width - itemWidths) / 2.0f;
+    CGFloat sideInsets = ([self adjustedCollectionViewWidth] - itemWidths) / 2.0f;
     return UIEdgeInsetsMake(0.0, sideInsets, 0.0, sideInsets);
   }
   return insets;
@@ -660,8 +683,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
 
   NSInteger count = [self collectionView:_collectionView numberOfItemsInSection:0];
   if (count > 0) {
-    CGRect bounds = _collectionView.bounds;
-    CGFloat halfBoundsWidth = bounds.size.width / 2.0f;
+    CGFloat halfBoundsWidth = [self adjustedCollectionViewWidth] / 2.0f;
 
     CGSize firstSize = [self collectionView:_collectionView
                                      layout:_flowLayout
@@ -719,7 +741,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
 
 @end
 
-#pragma mark -
+#pragma mark - MDCItemBarFlowLayout
 
 @implementation MDCItemBarFlowLayout {
   /// Map from item index paths to RTL-corrected layout attributes. If no RTL correction is in
@@ -776,7 +798,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   // Apply global content size padding.
   if (shouldPadContentSizeForRTL) {
     _isPaddingCollectionViewContentSize = YES;
-    _paddedCollectionViewContentSize = self.collectionView.bounds.size;
+    _paddedCollectionViewContentSize = [self adjustedCollectionViewBounds].size;
   } else {
     _isPaddingCollectionViewContentSize = NO;
   }
@@ -832,8 +854,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
 
   // Must call super here to ensure we have the original collection bounds.
   CGRect collectionBounds = {CGPointZero, [super collectionViewContentSize]};
-  newAttributes.frame = MDCRectFlippedForRTL(itemFrame, CGRectGetWidth(collectionBounds),
-                                             UIUserInterfaceLayoutDirectionRightToLeft);
+  newAttributes.frame = MDFRectFlippedHorizontally(itemFrame, CGRectGetWidth(collectionBounds));
 
   return newAttributes;
 }
@@ -846,7 +867,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   NSProcessInfo *processInfo = [NSProcessInfo processInfo];
   if ([processInfo respondsToSelector:@selector(isOperatingSystemAtLeastVersion:)] &&
       [processInfo isOperatingSystemAtLeastVersion:iOS9Version]) {
-    if (self.collectionView.mdc_effectiveUserInterfaceLayoutDirection ==
+    if (self.collectionView.mdf_effectiveUserInterfaceLayoutDirection ==
         UIUserInterfaceLayoutDirectionRightToLeft) {
       enforceRTL = YES;
     }
@@ -918,7 +939,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   // on the left to prevent the layout from "jumping" to the origin under various situations.
   // Must call super here to ensure we have the original collection content size.
   CGSize contentSize = [super collectionViewContentSize];
-  CGRect scrollBounds = self.collectionView.bounds;
+  CGRect scrollBounds = [self adjustedCollectionViewBounds];
   return contentSize.width < CGRectGetWidth(scrollBounds);
 }
 
@@ -926,7 +947,7 @@ static void *kItemPropertyContext = &kItemPropertyContext;
         (UICollectionViewLayoutAttributes *)attributes {
   // Must call super here to ensure we have the original collection content size.
   CGSize contentSize = [super collectionViewContentSize];
-  CGRect scrollBounds = self.collectionView.bounds;
+  CGRect scrollBounds = [self adjustedCollectionViewBounds];
 
   CGFloat leftPadding = CGRectGetWidth(scrollBounds) - contentSize.width;
 
@@ -939,6 +960,16 @@ static void *kItemPropertyContext = &kItemPropertyContext;
   newAttributes.frame = itemFrame;
 
   return newAttributes;
+}
+
+- (CGRect)adjustedCollectionViewBounds {
+#if defined(__IPHONE_11_0) && (__IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_11_0)
+  if (@available(iOS 11.0, *)) {
+    return UIEdgeInsetsInsetRect(self.collectionView.bounds,
+                                 self.collectionView.adjustedContentInset);
+  }
+#endif
+  return self.collectionView.bounds;
 }
 
 @end

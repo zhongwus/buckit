@@ -15,8 +15,9 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
 
     @IBOutlet var imageView: UIImageView!
     @IBOutlet var descriptionText: UITextField!
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     
-    var image = UIImage()
+    var imageURL = ""
     var text = ""
     var hasContent = false
     
@@ -24,12 +25,14 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
         super.viewDidLoad()
         
         if hasContent {
-            imageView.image = image
+            let url = URL(string: imageURL)
+            let data = try? Data(contentsOf: url!)
+            imageView.image = UIImage(data:data!)
             descriptionText.text = text
         }
         imageView.layer.borderColor = UIColor.gray.cgColor
         imageView.layer.borderWidth = 1
-        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Next", style: .plain, target: self, action: #selector(addTapped))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Done", style: .plain, target: self, action: #selector(addTapped))
         // Do any additional setup after loading the view.
     }
     
@@ -43,12 +46,11 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
             params.setPublicId(imageName)
             cloudinary.createUploader().upload(data: data, uploadPreset: "snumwks7", params: params, progress: nil, completionHandler: {(response, error) in
                 if error == nil {
-                    let ownerChallengeImageLink : String = "https://cloudinary.com/console/media_library#dialog/image/upload/\(imageName).jpg"
+                    let ownerChallengeImageLink : String = "https://res.cloudinary.com/sem/image/upload/\(imageName).jpg"
                     let  challengeDescription : String = self.descriptionText.text!
                     let  challengeName =  challengeDescription
                     let  challengeCreatedDate = "2017-09-10"
                     let  challengeType = "funny"
-                    let userId = "59febace4c638932592030ff"
                     let params: Parameters = [
                             "ownerChallengeImageLink":ownerChallengeImageLink,
                             "challengeDescription":challengeDescription,
@@ -57,10 +59,10 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
                             "challengeName":challengeName
                         ]
                     
-                    Alamofire.request("http://localhost:8080/api/users/\(userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                    Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
                         print(response)
                         if (response.result.isSuccess) {
-                            self.performSegue(withIdentifier: "friendSelectionSegue", sender: self)
+                            self.performSegue(withIdentifier: "unwindSeguetoHomeVC", sender: nil)
                         } else {
                             print("upload failed!")
                         }
@@ -70,10 +72,6 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
                 }
             })
         }
-        //print(urlpath)
-        //cloudinary.createUploader().upload(file: fileUrl)
-        
-        //uploader.upload(forUpload, options: ["public_id":"testo"])
     }
     
     

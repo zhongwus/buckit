@@ -10,6 +10,8 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
+var userId = UserDefaults.standard.string(forKey: "userId")!
+
 class UsersViewModel {
     private var user = User()
     
@@ -36,39 +38,33 @@ class UsersViewModel {
     
 }
 
-class ChallengeViewModel {
-    var challenges: [Challenge]?
+class ChallengeListViewModel {
     
-    var firstChallenge: Challenge {
-        return challenges![1]
-    }
-    
-    init() {
-        self.fetchChallenges()
-    }
+    var challengeList = [Challenge]()
 }
 
-extension ChallengeViewModel {
-    func fetchChallenges() {
+extension ChallengeListViewModel {
+    
+    /*func fetchChallenges() {
         let challenge1 = Challenge(name: "challenge1", picture: "https://c1.staticflickr.com/3/2912/13981352255_fc59cfdba2_b.jpg")
         let challenge2 = Challenge(name: "challenge2", picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrTFkZy0h_581tHDZ7Yhb2CeUNtfxOlxjvwAi0HtB_sWe_KLpGrg")
         
         self.challenges = [challenge1, challenge2]
-        /*Alamofire.request("http://172.29.92.108:8080/api/challenges") .responseJSON { response in // 1
-            //debugPrint("All Response Info: \(response)")
-            
+    }*/
+    
+    func fetchData(handler:@escaping () -> Void) {
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/myChallengeList") .responseJSON { response in
             if let data = response.result.value {
-                let json = JSON(data).array
-                print("started")
-                for challenge in json! {
-                    let name = challenge["challenegName"].string
-                    let link = challenge["challengeImageLink"].string
-                    let sample = Challenge(name: name!, picture: link!)
-                    self.challenges?.append(sample)
+                let json = JSON(data)["content"]
+                for challenge in json {
+                    let challengeId = challenge.1["id"].string
+                    let challengeDescription = challenge.1["challengeDescription"].string
+                    let challengeName = challenge.1["challengeName"].string
+                    self.challengeList.append(Challenge(id: challengeId!, name: challengeName!, description: challengeDescription!, image: challenge.1["ownerChallengeImageLink"].string!))
                 }
-                print(self.challenges?.count)
+                handler()
             }
-        }*/
+        }
     }
     
 }

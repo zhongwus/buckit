@@ -10,53 +10,32 @@ import UIKit
 import FBSDKLoginKit
 import FacebookCore
 import SwiftyJSON
+import IQKeyboardManagerSwift
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-
+    let defaults = UserDefaults.standard
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
    
         window = UIWindow(frame: UIScreen.main.bounds)
         window?.makeKeyAndVisible()
+        IQKeyboardManager.sharedManager().enable = true
         let storyboard = UIStoryboard(name:"Main",bundle:nil)
-        let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
-        window?.rootViewController = mainNavigationController
-        /*if (FBSDKAccessToken.current() != nil) {
-            print("token: " + "\(AccessToken.current)")
-            let graphRequest:FBSDKGraphRequest = FBSDKGraphRequest(graphPath: "me", parameters: ["fields":"first_name,last_name, picture.type(large)"])
-            graphRequest.start(completionHandler: { (connection, result, error) -> Void in
-                
-                if ((error) != nil)
-                {
-                    // Process error
-                    print("fail")
-                    print("Error: \(error)")
-                }
-                else
-                {
-                    let json = JSON(result)
-                    let defaults = UserDefaults.standard
-                    defaults.set(json["first_name"].string, forKey: "first_name")
-                    defaults.set(json["last_name"].string, forKey: "last_name")
-                    defaults.set(json["picture"]["data"]["url"].string, forKey: "avatarURL")
-                }
-            })
-            
-            
-            let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
-            window?.rootViewController = mainNavigationController
-            print("logged in")
-            //if you are logged
-        } else {
+        
+        UserDefaults.standard.set("10.0.0.192", forKey: "ipAddress")
+
+        if (UserDefaults.standard.string(forKey: "userId") == nil || UserDefaults.standard.string(forKey: "first_name") == nil) {
             let loginViewController = storyboard.instantiateViewController(withIdentifier: "loginViewController")
             window?.rootViewController = loginViewController
-            print("not logged in")
-            //if you are not logged
-        }*/
+        } else {
+            let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
+            window?.rootViewController = mainNavigationController
+        }
+    
         
         return FBSDKApplicationDelegate.sharedInstance().application(application, didFinishLaunchingWithOptions: launchOptions)
     }

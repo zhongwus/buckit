@@ -7,11 +7,11 @@
 //
 
 import UIKit
-import MaterialComponents
 import Alamofire
 import Koloda
 import SwiftyJSON
 import SideMenu
+import MaterialComponents
 
 private var numberOfCards: Int = 5
 
@@ -19,69 +19,60 @@ class HomeViewController: UIViewController {
 
     @IBOutlet weak var kolodaView: KolodaView!
     
-    @IBOutlet var crossButton: UIButton!
-    @IBOutlet var heartButton: UIButton!
+    @IBOutlet var crossButton: MDCFloatingButton!
+    @IBOutlet var heartButton: MDCFloatingButton!
+    @IBOutlet var challengeBtn: MDCFloatingButton!
+    @IBOutlet var createChallengeBtn: MDCFloatingButton!
     
-    var challengeViewModel = ChallengeViewModel()
+    var challengeViewModel = ChallengeListViewModel()
     var currentCardIndex = 0
+    var nextImage = UIImage()
     
-    fileprivate var dataSource: [(String,UIImage,String,String)] = []  // description, image, challengeId, userId
-    fileprivate var savedChallengeList = [String]() // savedChallengeListId, originalchallengeId
-    fileprivate var userId = "59febace4c638932592030ff"
+    //fileprivate var dataSource = [[String]]()  // description, image, challengeId, userId
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("homeviewloaded")
-        for challenge in challengeViewModel.challenges! {
-            let url = URL(string:challenge.picture!)
-            let data = try? Data(contentsOf: url!)
-            //dataSource.append(UIImage(data:data!)!)
-            dataSource.append(("demo description", UIImage(data:data!)!,"",""))
+        
+        setupUI()
+        
+        challengeViewModel.fetchData {
+            self.kolodaView.reloadData()
         }
         
-        Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in // 1
+        /*for challenge in challengeViewModel.challenges! {
+            dataSource.append(["demo description", challenge.picture!,"","",""])
+        }*/
+        
+        /*Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/myChallengeList") .responseJSON { response in
             if let data = response.result.value {
-                //let json = JSON(data).array
                 let json = JSON(data)["content"]
-                for savedChallenge in json {
-                    self.savedChallengeList.append(savedChallenge.1["challengeId"].string!)
-                }
-                
-                
-            }
-            
-            Alamofire.request("http://localhost:8080/api/challenges") .responseJSON { response in // 1
-                if let data = response.result.value {
-                    //let json = JSON(data).array
-                    let json = JSON(data)["content"]
-                    
-                    for challenge in json {
-                        let challengeId = challenge.1["id"].string
-                        let userId = challenge.1["userId"].string
-                        if self.savedChallengeList.contains(challengeId!) || self.userId == userId {
-                            continue
-                        }
-                        let url = URL(string: challenge.1["ownerChallengeImageLink"].string!)
-                        let data = try? Data(contentsOf: url!)
-                        let challengeDescription = challenge.1["challengeDescription"].string
-                        self.dataSource.append((challengeDescription!,UIImage(data:data!)!,challengeId!,userId!))
-                        
-                    }
+                for challenge in json {
+                    let challengeId = challenge.1["id"].string
+                    let userId = challenge.1["userId"].string
+                    let challengeDescription = challenge.1["challengeDescription"].string
+                    let challengeName = challenge.1["challengeName"].string
+                    self.dataSource.append([challengeDescription!,challenge.1["ownerChallengeImageLink"].string!,challengeId!,userId!,challengeName!])
                 }
             }
-        }
-        
-        
-        
-        // Do any additional setup after loading the view.
-        crossButton.setImage(UIImage(named:"cross"), for: UIControlState.normal)
-        heartButton.setImage(UIImage(named:"heart"), for: UIControlState.normal)
+        }*/
         
         kolodaView.dataSource = self
         kolodaView.delegate = self
         
         self.modalTransitionStyle = UIModalTransitionStyle.flipHorizontal
         
+    }
+    
+    func setupUI() {
+        createChallengeBtn.backgroundColor = UIColor(red: 40/255, green: 53/255, blue: 147/255, alpha: 1)
+        createChallengeBtn.titleLabel?.font = UIFont.systemFont(ofSize: 40)
+        crossButton.setImage(UIImage(named:"cross"), for: UIControlState.normal)
+        crossButton.setImage(UIImage(named:"cross"), for: UIControlState.highlighted)
+        crossButton.imageView?.contentMode = .scaleAspectFit
+        heartButton.setImage(UIImage(named:"heart"), for: UIControlState.normal)
+        heartButton.setImage(UIImage(named:"heart"), for: UIControlState.highlighted)
+        heartButton.imageView?.contentMode = .scaleAspectFit
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -96,9 +87,10 @@ class HomeViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         let destinationVC = segue.destination as! CreateChallengeViewController
         if segue.identifier == "challengeSegue" {
+            let currentChallenge = challengeViewModel.challengeList[currentCardIndex]
             destinationVC.hasContent = true
-            destinationVC.image = dataSource[currentCardIndex].1
-            destinationVC.text = dataSource[currentCardIndex].0
+            destinationVC.imageURL = currentChallenge.image!
+            destinationVC.text = currentChallenge.description!
         }
     }
     
@@ -131,26 +123,21 @@ class HomeViewController: UIViewController {
 extension HomeViewController: KolodaViewDelegate {
     
     func kolodaDidRunOutOfCards(_ koloda: KolodaView) {
-        /*let position = kolodaView.currentCardIndex
-        for i in 1...4 {
-            dataSource.append(UIImage(named: "Card_like_\(i)")!)
-        }
-        kolodaView.insertCardAtIndexRange(position..<position + 4, animated: true)*/
         koloda.reloadData()
     }
     
     func koloda(_ koloda: KolodaView, didSelectCardAt index: Int) {
-        //UIApplication.shared.openURL(URL(string: "https://yalantis.com/")!)
     }
     
     func koloda(_ koloda: KolodaView, didSwipeCardAt index: Int, in direction: SwipeResultDirection) {
         print("swiped at index \(index), with direction \(direction)")
         currentCardIndex += 1
-        //self.dataSource[index].0
         if direction.rawValue == "right" {
-            let challengeId = dataSource[index].2
-            let params : Parameters = ["challengeId":challengeId]
-            Alamofire.request("http://localhost:8080/api/users/\(userId)/savedChallengeList",method:.post, parameters: params,encoding:JSONEncoding.default) .responseString { response in // 1
+            let currentChallenge = challengeViewModel.challengeList[currentCardIndex]
+            let challengeId = currentChallenge.id!
+            let challengeName = currentChallenge.name!
+            let params : Parameters = ["challengeId":challengeId,"challengeName":challengeName]
+            Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/savedChallengeList",method:.post, parameters: params,encoding:JSONEncoding.default) .responseString { response in // 1
                 if (response.result.isSuccess) {
                     print("success")
                 } else {
@@ -168,7 +155,7 @@ extension HomeViewController: KolodaViewDelegate {
 extension HomeViewController: KolodaViewDataSource {
     
     func kolodaNumberOfCards(_ koloda: KolodaView) -> Int {
-        return dataSource.count
+        return challengeViewModel.challengeList.count
     }
     
     func kolodaSpeedThatCardShouldDrag(_ koloda: KolodaView) -> DragSpeed {
@@ -179,8 +166,11 @@ extension HomeViewController: KolodaViewDataSource {
         let albumView = Bundle.main.loadNibNamed("AlbumView", owner: self, options: nil)?[0] as? AlbumView
         albumView?.layer.borderColor = UIColor.gray.cgColor
         albumView?.layer.borderWidth = 1
-        albumView?.photoView.image = dataSource[Int(index)].1
-        albumView?.descriptionView.text = dataSource[Int(index)].0
+        let url = URL(string: challengeViewModel.challengeList[Int(index)].image!)
+        //print(url)
+        let data = try? Data(contentsOf: url!)
+        albumView?.photoView.image = UIImage(data:data!)
+        albumView?.descriptionView.text = challengeViewModel.challengeList[Int(index)].description
         return albumView!
     }
     

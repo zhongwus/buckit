@@ -22,13 +22,13 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
     
     var users: [(String,Int)] = []
     var userInfo = Dictionary<String, Any>()
-    fileprivate var userId = "59febace4c638932592030ff"
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("loaded")
+        print("leaderboard loaded")
         userInfo["numOfFriends"] = ""
-        Alamofire.request("http://localhost:8080/api/users") .responseJSON { response in // 1
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users") .responseJSON { response in // 1
             if let data = response.result.value {
                 //let json = JSON(data).array
                 let json = JSON(data)["content"]
@@ -56,7 +56,7 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
                 
                 self.tableView.reloadData()
                 
-                Alamofire.request("http://localhost:8080/api/users/\(self.userId)/friends") .responseJSON { response in // 1
+                Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/friends") .responseJSON { response in // 1
                     if let data = response.result.value {
                         let json = JSON(data)["content"]
                         self.userInfo["numOfFriends"] = json.count
@@ -70,6 +70,10 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
         tableView.delegate = self
         tableView.dataSource = self
         // Do any additional setup after loading the view.
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        print("view will appear called")
     }
 
     override func didReceiveMemoryWarning() {
@@ -90,13 +94,11 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCell(withIdentifier: "userCell") as! LeaderboardTableViewCell
-        let right = String(users[indexPath.row].1) + "Pts."
-        let left = "\(indexPath.row + 1). " + users[indexPath.row].0
-        cell.userName.text = left
-        cell.score.text = right
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: "userCell")
+        cell?.textLabel?.text = "\(indexPath.row + 1). " + users[indexPath.row].0
+        cell?.detailTextLabel?.text = String(users[indexPath.row].1) + "Pts."
 
-        return cell
+        return cell!
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {

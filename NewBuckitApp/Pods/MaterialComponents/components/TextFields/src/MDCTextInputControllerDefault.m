@@ -22,12 +22,13 @@
 #import "MDCTextInput.h"
 #import "MDCTextInputBorderView.h"
 #import "MDCTextInputCharacterCounter.h"
+#import "MDCTextInputController.h"
+#import "MDCTextInputControllerFloatingPlaceholder.h"
 #import "MDCTextInputUnderlineView.h"
 
 #import "MaterialAnimationTiming.h"
 #import "MaterialMath.h"
 #import "MaterialPalettes.h"
-#import "MaterialRTL.h"
 #import "MaterialTypography.h"
 
 #pragma mark - Constants
@@ -161,13 +162,13 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
   UIRectCorner _roundedCorners;
 }
 
-@property(nonatomic, assign, readonly) BOOL isPlaceholderUp;
-
 @property(nonatomic, strong) MDCTextInputAllCharactersCounter *internalCharacterCounter;
+
+@property(nonatomic, copy) NSArray<NSLayoutConstraint *> *placeholderAnimationConstraints;
 
 @property(nonatomic, strong) NSLayoutConstraint *placeholderAnimationConstraintLeading;
 @property(nonatomic, strong) NSLayoutConstraint *placeholderAnimationConstraintTop;
-@property(nonatomic, strong) NSArray<NSLayoutConstraint *> *placeholderAnimationConstraints;
+@property(nonatomic, strong) NSLayoutConstraint *placeholderAnimationConstraintTrailing;
 
 @property(nonatomic, copy) NSString *errorAccessibilityValue;
 @property(nonatomic, copy, readwrite) NSString *errorText;
@@ -179,6 +180,7 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
 
 @synthesize characterCountMax = _characterCountMax;
 @synthesize characterCountViewMode = _characterCountViewMode;
+@synthesize floatingEnabled = _floatingEnabled;
 @synthesize roundedCorners = _roundedCorners;
 @synthesize textInput = _textInput;
 @synthesize underlineViewMode = _underlineViewMode;
@@ -396,10 +398,6 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
                       selector:@selector(textInputDidEndEditing:)
                           name:UITextFieldTextDidEndEditingNotification
                         object:_textInput];
-    [defaultCenter addObserver:self
-                      selector:@selector(textInputDidChange:)
-                          name:MDCTextFieldTextDidSetTextNotification
-                        object:_textInput];
   }
 
   if ([_textInput isKindOfClass:[MDCMultilineTextField class]]) {
@@ -416,18 +414,18 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
                       selector:@selector(textInputDidEndEditing:)
                           name:UITextViewTextDidEndEditingNotification
                         object:textField.textView];
-    [defaultCenter addObserver:self
-                      selector:@selector(textInputDidChange:)
-                          name:MDCTextFieldTextDidSetTextNotification
-                        object:_textInput];
   }
+
+  [defaultCenter addObserver:self
+                    selector:@selector(textInputDidChange:)
+                        name:MDCTextFieldTextDidSetTextNotification
+                      object:_textInput];
 }
 
 - (void)unsubscribeFromNotifications {
   NSNotificationCenter *defaultCenter = [NSNotificationCenter defaultCenter];
   [defaultCenter removeObserver:self];
 }
-
 
 #pragma mark - Border Customization
 
@@ -485,11 +483,13 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
 
 #pragma mark - Placeholder Customization
 
+// This updates the placeholder's visual characteristics and not its layout. See the section
+// "Placeholder Floating" for methods that update the layout.
 - (void)updatePlaceholder {
   self.textInput.placeholderLabel.font = self.inlinePlaceholderFont;
 
   UIColor *placeholderColor;
-  if (self.isPlaceholderUp) {
+  if ([self isPlaceholderUp]) {
     UIColor *nonErrorColor = self.textInput.isEditing ? self.activeColor :
         self.floatingPlaceholderNormalColor;
     placeholderColor =
@@ -502,11 +502,153 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
   self.textInput.placeholderLabel.textColor = placeholderColor;
 }
 
+#pragma mark - Placeholder Floating
+
+// 'Up' in these methods always means the placeholder is floating; it's .y is smaller and it's not
+// 'inline' with the text input. The placeholder also doesn't disappear when you type since it's
+// functioning as a title label when 'up'.
+
+- (void)movePlaceholderToUp:(BOOL)isToUp {
+  if ([self isPlaceholderUp] == isToUp) {
+    return;
+  }
+
+  CGFloat scaleFactor = (CGFloat)self.floatingPlaceholderScale.floatValue;
+  CGAffineTransform floatingPlaceholderScaleTransform =
+      CGAffineTransformMakeScale(scaleFactor, scaleFactor);
+
+  // The animation is accomplished pretty simply. A constraint for vertical and a constraint for
+  // horizontal offset, both with a required priority (1000), are acivated on the placeholderLabel.
+  // A simple scale transform is also applied. Then it's animated through the UIView animation API
+  // (layoutIfNeeded). If in reverse (isToUp == NO), these things are just removed / deactivated.
+
+  CGAffineTransform scaleTransform =
+      isToUp ? floatingPlaceholderScaleTransform : CGAffineTransformIdentity;
+
+  // We do this beforehand to flush the layout engine.
+  [self.textInput layoutIfNeeded];
+  [self updatePlaceholder];
+  [self updatePlaceholderAnimationConstraints:isToUp];
+  [UIView animateWithDuration:[CATransaction animationDuration]
+      animations:^{
+        self.textInput.placeholderLabel.transform = scaleTransform;
+
+        [self.textInput layoutIfNeeded];
+      }
+      completion:^(__unused BOOL finished) {
+        if (!isToUp) {
+          [self cleanupPlaceholderAnimationConstraints];
+        }
+      }];
+}
+
+- (BOOL)isPlaceholderUp {
+  return self.placeholderAnimationConstraints.count > 0 &&
+      !CGAffineTransformEqualToTransform(self.textInput.placeholderLabel.transform,
+                                         CGAffineTransformIdentity);
+}
+
+// Sometimes we set up the animation constraints for floating up before we have a width for the text
+// field. Since there is math that needs to compensate for the transform in relation to the width,
+// we update the constants on the constraints.
+//
+// Note: this method is not called inside updateLayout.
+- (void)updatePlaceholderAnimationConstraints:(BOOL)isToUp {
+  if (isToUp) {
+    UIOffset offset = [self floatingPlaceholderOffset];
+
+    // Remember, the insets are always in LTR. It's automatically flipped when used in RTL.
+    // See MDCTextInputController.h.
+    UIEdgeInsets insets = self.textInput.textInsets;
+
+    CGFloat leadingConstant = [self floatingPlaceholderAnimationConstraintLeadingConstant:insets
+                                                                                   offset:offset];
+    if (!self.placeholderAnimationConstraintLeading) {
+      self.placeholderAnimationConstraintLeading =
+          [NSLayoutConstraint constraintWithItem:self.textInput.placeholderLabel
+                                       attribute:NSLayoutAttributeLeading
+                                       relatedBy:NSLayoutRelationEqual
+                                          toItem:self.textInput
+                                       attribute:NSLayoutAttributeLeading
+                                      multiplier:1
+                                        constant:leadingConstant];
+    }
+    self.placeholderAnimationConstraintLeading.constant = leadingConstant;
+
+    if (!self.placeholderAnimationConstraintTop) {
+      self.placeholderAnimationConstraintTop =
+          [NSLayoutConstraint constraintWithItem:self.textInput.placeholderLabel
+                                       attribute:NSLayoutAttributeTop
+                                       relatedBy:NSLayoutRelationEqual
+                                          toItem:self.textInput
+                                       attribute:NSLayoutAttributeTop
+                                      multiplier:1
+                                        constant:offset.vertical];
+    }
+    self.placeholderAnimationConstraintTop.constant = offset.vertical;
+
+    CGFloat trailingConstant = [self floatingPlaceholderAnimationConstraintTrailingConstant:insets
+                                                                                     offset:offset];
+    if (!self.placeholderAnimationConstraintTrailing) {
+      self.placeholderAnimationConstraintTrailing =
+          [NSLayoutConstraint constraintWithItem:self.textInput.placeholderLabel
+                                       attribute:NSLayoutAttributeTrailing
+                                       relatedBy:NSLayoutRelationEqual
+                                          toItem:self.textInput
+                                       attribute:NSLayoutAttributeTrailing
+                                      multiplier:1
+                                        constant:trailingConstant];
+      self.placeholderAnimationConstraintTrailing.priority = UILayoutPriorityDefaultHigh - 1;
+    }
+    self.placeholderAnimationConstraintTrailing.constant = trailingConstant;
+
+    self.placeholderAnimationConstraints = @[
+      self.placeholderAnimationConstraintLeading, self.placeholderAnimationConstraintTop,
+      self.placeholderAnimationConstraintTrailing
+    ];
+    [NSLayoutConstraint activateConstraints:self.placeholderAnimationConstraints];
+  } else {
+    [NSLayoutConstraint deactivateConstraints:self.placeholderAnimationConstraints];
+  }
+}
+
+// Sometimes we set up the animation constraints for floating up before we have a width for the text
+// field. Since there is math that needs to compensate for the transform in relation to the width,
+// we check to see if the constraints still have the correct constants.
+- (BOOL)needsUpdatePlaceholderAnimationConstraintsToUp {
+  if (![self isPlaceholderUp]) {
+    return NO;
+  }
+
+  // Remember, the insets are always in LTR. It's automatically flipped when used in RTL.
+  // See MDCTextInputController.h.
+  UIEdgeInsets insets = self.textInput.textInsets;
+
+  UIOffset offset = [self floatingPlaceholderOffset];
+
+  CGFloat leadingConstant = [self floatingPlaceholderAnimationConstraintLeadingConstant:insets
+                                                                                 offset:offset];
+  CGFloat trailingConstant = [self floatingPlaceholderAnimationConstraintTrailingConstant:insets
+                                                                                   offset:offset];
+
+  return self.placeholderAnimationConstraintLeading.constant != leadingConstant &&
+      self.placeholderAnimationConstraintTrailing.constant != trailingConstant;
+}
+
+// When placeholder is not up, it just uses the layout code that comes for free from the text field
+// itself. That means these constraints need go away. So, we can use the existence of them as a
+// way to check if the placeholder is floating up. See isPlacehodlerUp.
+- (void)cleanupPlaceholderAnimationConstraints {
+  self.placeholderAnimationConstraints = nil;
+  self.placeholderAnimationConstraintLeading = nil;
+  self.placeholderAnimationConstraintTop = nil;
+  self.placeholderAnimationConstraintTrailing = nil;
+}
+
 // Sometimes the text field is not showing the correct layout for its values (like when it's created
 // with .text already entered) so we make sure it's in the right place always.
 //
-// Note that this calls updateLayout inside it so it is the only 'update-' method not included in
-// updateLayout.
+// Note that this calls updateLayout inside it so it is not included in updateLayout.
 - (void)forceUpdatePlaceholderY {
   BOOL isDirectionToUp = NO;
   if (self.floatingEnabled) {
@@ -524,110 +666,55 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
   [self.textInput layoutIfNeeded];
 }
 
-- (BOOL)isPlaceholderUp {
-  return self.placeholderAnimationConstraints.count > 0 &&
-         !CGAffineTransformEqualToTransform(self.textInput.placeholderLabel.transform,
-                                            CGAffineTransformIdentity);
-}
-
-#pragma mark - Placeholder Animation
-
-- (void)movePlaceholderToUp:(BOOL)isToUp {
-  if (self.isPlaceholderUp == isToUp) {
-    return;
-  }
-
-  CGFloat scaleFactor = (CGFloat)self.floatingPlaceholderScale.floatValue;
-  CGAffineTransform floatingPlaceholderScaleTransform =
-      CGAffineTransformMakeScale(scaleFactor, scaleFactor);
-
-  // The animation is accomplished pretty simply. A constraint for vertical and a constraint for
-  // horizontal offset, both with a required priority (1000), are acivated on the placeholderLabel.
-  // A simple scale transform is also applied. Then it's animated through the UIView animation API
-  // (layoutIfNeeded). If in reverse (isToUp == NO), these things are just removed / deactivated.
-
-  CGAffineTransform destinationTransform = isToUp ? floatingPlaceholderScaleTransform : CGAffineTransformIdentity;
-
-  // We do this beforehand to flush the layout engine.
-  [self.textInput layoutIfNeeded];
-  [UIView animateWithDuration:[CATransaction animationDuration]
-      animations:^{
-        self.textInput.placeholderLabel.transform = destinationTransform;
-        [self updatePlaceholder];
-        [self updatePlaceholderAnimationConstraints:isToUp];
-
-        [self.textInput layoutIfNeeded];
-      }
-      completion:^(__unused BOOL finished) {
-        if (!isToUp) {
-          [self cleanupPlaceholderAnimationConstraints];
-        }
-      }];
-}
-
-- (void)updatePlaceholderAnimationConstraints:(BOOL)isToUp {
-  if (isToUp) {
-    CGPoint destination = [self floatingPlaceholderDestination];
-
-    if (!self.placeholderAnimationConstraintLeading) {
-      self.placeholderAnimationConstraintLeading =
-          [NSLayoutConstraint constraintWithItem:self.textInput.placeholderLabel
-                                       attribute:NSLayoutAttributeLeading
-                                       relatedBy:NSLayoutRelationEqual
-                                          toItem:self.textInput
-                                       attribute:NSLayoutAttributeLeading
-                                      multiplier:1
-                                        constant:destination.x];
-    }
-    self.placeholderAnimationConstraintLeading.constant = destination.x;
-
-    if (!self.placeholderAnimationConstraintTop) {
-      self.placeholderAnimationConstraintTop =
-          [NSLayoutConstraint constraintWithItem:self.textInput.placeholderLabel
-                                       attribute:NSLayoutAttributeTop
-                                       relatedBy:NSLayoutRelationEqual
-                                          toItem:self.textInput
-                                       attribute:NSLayoutAttributeTop
-                                      multiplier:1
-                                        constant:destination.y];
-    }
-    self.placeholderAnimationConstraintTop.constant = destination.y;
-
-    self.placeholderAnimationConstraints = @[ self.placeholderAnimationConstraintLeading,
-                                              self.placeholderAnimationConstraintTop ];
-    [NSLayoutConstraint activateConstraints:self.placeholderAnimationConstraints];
-  } else {
-    [NSLayoutConstraint deactivateConstraints:self.placeholderAnimationConstraints];
-  }
-}
-
-- (void)cleanupPlaceholderAnimationConstraints {
-  self.placeholderAnimationConstraints = nil;
-  self.placeholderAnimationConstraintLeading = nil;
-  self.placeholderAnimationConstraintTop = nil;
-}
-
-- (CGPoint)floatingPlaceholderDestination {
-  CGFloat placeholderY = MDCTextInputDefaultPadding;
+// The placeholder has a simple scale transform on it. The default is to reduce the size by 25%.
+// Unfortunately, auto layout has no concept of compensating for transforms and it keeps the same
+// alignmentRect as if it weren't transformed at all. That gives the impression the placeholder,
+// when floating up, is too far to the trailing side. This offset is part of a compensation for
+// that. It calculates the amount of space between the alignmentRect's sides and the actual shrunken
+// placeholder label.
+- (UIOffset)floatingPlaceholderOffset {
+  CGFloat vertical = MDCTextInputDefaultPadding;
 
   // Offsets needed due to transform working on normal (0.5,0.5) anchor point.
-  // Why no anchor point of (0,0)? Because our users wouldn't expect it.
-  placeholderY -= self.textInput.placeholderLabel.font.lineHeight *
-                  (1 - (CGFloat)self.floatingPlaceholderScale.floatValue) * .5f;
+  // Why no anchor point of (0,0)? Because autolayout doesn't play well with anchor points.
+  vertical -= self.textInput.placeholderLabel.font.lineHeight *
+              (1 - (CGFloat)self.floatingPlaceholderScale.floatValue) * .5f;
 
-  CGFloat estimatedWidth = MDCCeil(CGRectGetWidth([self.textInput.placeholderLabel.text
-      boundingRectWithSize:CGSizeMake(CGFLOAT_MAX, self.textInput.placeholderLabel.font.lineHeight)
-                   options:0
-                attributes:@{
-                  NSFontAttributeName : self.textInput.font
-                }
-                   context:nil]));
-  CGFloat placeholderX =
-      -1 * estimatedWidth * (1 - (CGFloat)self.floatingPlaceholderScale.floatValue) * .5f;
+  // Remember, the insets are always in LTR. It's automatically flipped when used in RTL.
+  // See MDCTextInputController.h.
+  UIEdgeInsets insets = self.textInput.textInsets;
 
-  placeholderX += self.textInput.textInsets.left;
+  CGFloat placeholderMaxWidth =
+      CGRectGetWidth(self.textInput.bounds) / self.floatingPlaceholderScale.floatValue -
+      insets.left - insets.right;
 
-  return CGPointMake(placeholderX, placeholderY);
+  CGFloat placeholderWidth =
+      [self.textInput.placeholderLabel systemLayoutSizeFittingSize:UILayoutFittingCompressedSize]
+          .width;
+  if (placeholderWidth > placeholderMaxWidth) {
+    placeholderWidth = placeholderMaxWidth;
+  }
+
+  CGFloat horizontal =
+      placeholderWidth * (1 - (CGFloat)self.floatingPlaceholderScale.floatValue) * .5f;
+
+  return UIOffsetMake(horizontal, vertical);
+}
+
+// Remember, the insets are always in LTR. It's automatically flipped when used in RTL.
+// See MDCTextInputController.h.
+- (CGFloat)floatingPlaceholderAnimationConstraintLeadingConstant:(UIEdgeInsets)textInsets
+                                                          offset:(UIOffset)offset {
+  CGFloat constant = textInsets.left - offset.horizontal;
+  return constant;
+}
+
+// Remember, the insets are always in LTR. It's automatically flipped when used in RTL.
+// See MDCTextInputController.h.
+- (CGFloat)floatingPlaceholderAnimationConstraintTrailingConstant:(UIEdgeInsets)textInsets
+                                                          offset:(UIOffset)offset {
+  CGFloat constant = offset.horizontal - textInsets.right;
+  return constant;
 }
 
 #pragma mark - Trailing Label Customization
@@ -638,7 +725,6 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
   } else {
     self.textInput.trailingUnderlineLabel.text = [self characterCountText];
     self.textInput.trailingUnderlineLabel.font = self.trailingUnderlineLabelFont;
-
   }
 
   UIColor *textColor = self.trailingUnderlineLabelTextColor;
@@ -800,6 +886,8 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
                                                : MDCTextInputDefaultNormalUnderlineColorDefault();
 }
 
+// This is when the character count text is red because the inputted text has more characters than
+// the characterCountMax allows.
 - (BOOL)isDisplayingCharacterCountError {
   return self.characterCountMax && [self characterCount] > self.characterCountMax;
 }
@@ -913,6 +1001,7 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
             : [NSNumber numberWithFloat:(float)[self class].floatingPlaceholderScaleDefault];
 
     [self updatePlaceholder];
+    [self.textInput setNeedsUpdateConstraints];
   }
 }
 
@@ -1277,6 +1366,16 @@ static UITextFieldViewMode _underlineViewModeDefault = UITextFieldViewModeWhileE
 
 - (void)textInputDidLayoutSubviews {
   [self updateBorder];
+
+  if ([self needsUpdatePlaceholderAnimationConstraintsToUp]) {
+    [self updatePlaceholderAnimationConstraints:YES];
+  }
+}
+
+- (void)textInputDidUpdateConstraints {
+  if (self.isFloatingEnabled && _textInput.text.length > 0) {
+    [self updatePlaceholderAnimationConstraints:YES];
+  }
 }
 
 #pragma mark - UITextField & UITextView Notification Observation

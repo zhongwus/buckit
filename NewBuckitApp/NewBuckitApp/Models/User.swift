@@ -8,19 +8,25 @@
 
 import Foundation
 
-class User {
+struct User {
     var first_name: String?
     var last_name: String?
     var avatarURL: String?
     
 }
 
-class Challenge {
+struct Challenge {
+    var id: String?
     var name: String?
-    var picture: String?
+    var description: String?
+    var image: String?
     
-    init(name:String,picture:String) {
+    init(id:String, name:String,description:String,image:String) {
+        self.id = id
         self.name = name
-        self.picture = picture
+        self.description = description
+        self.image = image
     }
 }
+
+

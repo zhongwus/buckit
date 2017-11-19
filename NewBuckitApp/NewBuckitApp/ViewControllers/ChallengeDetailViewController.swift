@@ -19,7 +19,7 @@ class ChallengeDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        Alamofire.request("http://localhost:8080/api/challenges/\(challengeId)").responseJSON { response in
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/challenges/\(challengeId)").responseJSON { response in
             if let data = response.result.value {
                 self.challenge = JSON(data)["content"].dictionaryObject!
                 Alamofire.request(self.challenge["ownerChallengeImageLink"] as! String).responseJSON { response in
@@ -28,7 +28,6 @@ class ChallengeDetailViewController: UIViewController {
                     albumView?.layer.borderColor = UIColor.gray.cgColor
                     albumView?.layer.borderWidth = 1
                     albumView?.photoView.image = UIImage(data: response.data!, scale:1)
-                    self.challenge["image"] = UIImage(data: response.data!, scale:1)
                     albumView?.descriptionView.text = self.challenge["challengeDescription"] as? String
                     albumView?.frame = self.challengeAlbumView.bounds
                     albumView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -51,8 +50,7 @@ class ChallengeDetailViewController: UIViewController {
         let destinationVC = segue.destination as! CreateChallengeViewController
         if segue.identifier == "challengeSegue1" {
             destinationVC.hasContent = true
-            print(self.challenge)
-            destinationVC.image = self.challenge["image"] as! UIImage
+            destinationVC.imageURL = self.challenge["ownerChallengeImageLink"] as! String
             destinationVC.text = self.challenge["challengeDescription"] as! String
         }
     }

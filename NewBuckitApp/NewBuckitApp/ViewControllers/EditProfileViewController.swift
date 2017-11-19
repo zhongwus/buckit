@@ -12,7 +12,7 @@ import SwiftyJSON
 
 class EditProfileViewController: UIViewController {
     
-    fileprivate var userId = "59febace4c638932592030ff"
+    fileprivate var userId = UserDefaults.standard.string(forKey: "userId")!
     
     @IBOutlet var firstNameTextField: UITextField!
     @IBOutlet var lastNameTextField: UITextField!
@@ -22,7 +22,7 @@ class EditProfileViewController: UIViewController {
         super.viewDidLoad()
         
         
-        Alamofire.request("http://10.0.0.192:8080/api/users/\(userId)") .responseJSON { response in // 1
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)") .responseJSON { response in // 1
             if let data = response.result.value {
                 let json = JSON(data)["content"]
                 self.firstNameTextField.text = json["firstName"].string!
@@ -49,12 +49,12 @@ class EditProfileViewController: UIViewController {
             "lastName":lastNameTextField.text ?? "",
             "emailAddress":emailTextField.text ?? ""
         ]
-        Alamofire.request("http://localhost/api/users/\(userId)",method:.patch,parameters:params,encoding: JSONEncoding.default) .responseJSON { response in // 1
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)",method:.patch,parameters:params,encoding: JSONEncoding.default) .responseJSON { response in // 1
             if response.result.isSuccess {
                 self.dismiss(animated: true, completion: nil)
+                UserDefaults.standard.set(params["firstName"], forKey: "first_name")
             }
         }
-        self.dismiss(animated: true, completion: nil)
     }
     
 
