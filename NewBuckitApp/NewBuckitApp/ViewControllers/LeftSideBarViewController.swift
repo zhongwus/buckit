@@ -57,10 +57,12 @@ class LeftSideBarViewController: UIViewController,UITableViewDataSource, UITable
             let loginManager = FBSDKLoginManager()
             loginManager.logOut()
             UserDefaults.standard.removeObject(forKey: "userId")
-            let storyboard = UIStoryboard(name:"Main",bundle:nil)
-            let loginController = storyboard.instantiateViewController(withIdentifier: "loginViewController") 
-            let appDelegate = UIApplication.shared.delegate as! AppDelegate
-            appDelegate.window?.rootViewController = loginController
+            self.dismiss(animated: true, completion: {
+                let storyboard = UIStoryboard(name:"Main",bundle:nil)
+                let loginController = storyboard.instantiateViewController(withIdentifier: "loginViewController")
+                let appDelegate = UIApplication.shared.delegate as! AppDelegate
+                appDelegate.window?.rootViewController = loginController
+            })
         } else if (cell?.textLabel?.text == "Home") {
             self.dismiss(animated: true, completion: {
                 self.defaults.set("home", forKey: "pageName")

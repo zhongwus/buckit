@@ -26,7 +26,6 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        print("leaderboard loaded")
         userInfo["numOfFriends"] = ""
         Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users") .responseJSON { response in // 1
             if let data = response.result.value {
@@ -66,10 +65,17 @@ class LeaderboardViewController: UIViewController, UITableViewDataSource, UITabl
             }
         }
         
+        UserDefaults.standard.addObserver(self, forKeyPath: "first_name", options: NSKeyValueObservingOptions.new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: "last_name", options: NSKeyValueObservingOptions.new, context: nil)
+        
         
         tableView.delegate = self
         tableView.dataSource = self
         // Do any additional setup after loading the view.
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        name.text = "\(UserDefaults.standard.string(forKey: "first_name")!) \(UserDefaults.standard.string(forKey: "last_name")!)"
     }
     
     override func viewWillAppear(_ animated: Bool) {

@@ -52,6 +52,7 @@ class ChallengeDetailViewController: UIViewController {
             destinationVC.hasContent = true
             destinationVC.imageURL = self.challenge["ownerChallengeImageLink"] as! String
             destinationVC.text = self.challenge["challengeDescription"] as! String
+            destinationVC.challengeId = self.challenge["id"] as! String
         }
     }
     

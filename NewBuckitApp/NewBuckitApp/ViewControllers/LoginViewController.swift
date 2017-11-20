@@ -12,20 +12,16 @@ import FBSDKLoginKit
 import FacebookCore
 import Alamofire
 import SwiftyJSON
+import MaterialComponents
 
 class LoginViewController: UIViewController {
 
+    @IBOutlet var fbLoginBtn: MDCRaisedButton!
     override func viewDidLoad() {
         super.viewDidLoad()
         //view.backgroundColor = .yellow
-        view.backgroundColor = UIColor(patternImage: UIImage(named:"background1")!)
-        let myLoginButton = UIButton(type: .custom)
-        myLoginButton.backgroundColor = UIColor(red:0.05, green:0.20, blue:0.37, alpha:1.0)
-        myLoginButton.frame = CGRect(x: 0, y: 0, width: 180, height: 40)
-        myLoginButton.center = view.center
-        myLoginButton.setTitle("Facebook Login", for: .normal)
-        myLoginButton.addTarget(self, action: #selector(self.loginButtonClicked), for: .touchUpInside)
-        view.addSubview(myLoginButton)
+        view.backgroundColor = UIColor(patternImage: UIImage(named:"loginImage")!)
+        fbLoginBtn.addTarget(self, action: #selector(self.loginButtonClicked), for: .touchUpInside)
         
         // Do any additional setup after loading the view.
         
@@ -36,7 +32,7 @@ class LoginViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
+
     
     @objc func loginButtonClicked() {
         
@@ -71,11 +67,12 @@ class LoginViewController: UIViewController {
                                     defaults.set(json["last_name"].string,forKey:"last_name")
                                     defaults.set(json["email"].string,forKey:"email")
                                     defaults.set(json["picture"]["data"]["url"].string,forKey:"profilePictureLink")
-                                     let storyboard = UIStoryboard(name:"Main",bundle:nil)
+                                     /*let storyboard = UIStoryboard(name:"Main",bundle:nil)
                                      let mainNavigationController = storyboard.instantiateViewController(withIdentifier: "mainNavigationController")
                                      mainNavigationController.modalTransitionStyle = .flipHorizontal
                                      let appDelegate = UIApplication.shared.delegate as! AppDelegate
-                                     appDelegate.window?.rootViewController = mainNavigationController
+                                     appDelegate.window?.rootViewController = mainNavigationController*/
+                                    self.performSegue(withIdentifier: "gotoMainPageSegue", sender: self)
                                 }
                             } else {
                              print("Login Failed")

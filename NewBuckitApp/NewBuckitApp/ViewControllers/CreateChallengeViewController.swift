@@ -19,6 +19,7 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
     
     var imageURL = ""
     var text = ""
+    var challengeId = ""
     var hasContent = false
     
     override func viewDidLoad() {
@@ -46,27 +47,51 @@ class CreateChallengeViewController: UIViewController, UIImagePickerControllerDe
             params.setPublicId(imageName)
             cloudinary.createUploader().upload(data: data, uploadPreset: "snumwks7", params: params, progress: nil, completionHandler: {(response, error) in
                 if error == nil {
-                    let ownerChallengeImageLink : String = "https://res.cloudinary.com/sem/image/upload/\(imageName).jpg"
+                    let challengeImageLink : String = "https://res.cloudinary.com/sem/image/upload/\(imageName).jpg"
                     let  challengeDescription : String = self.descriptionText.text!
                     let  challengeName =  challengeDescription
-                    let  challengeCreatedDate = "2017-09-10"
-                    let  challengeType = "funny"
-                    let params: Parameters = [
-                            "ownerChallengeImageLink":ownerChallengeImageLink,
-                            "challengeDescription":challengeDescription,
-                            "challengeType":challengeType,
-                            "challengeCreatedDate":challengeCreatedDate,
-                            "challengeName":challengeName
-                        ]
                     
-                    Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                    if (self.hasContent) {
+                        let params: Parameters = [
+                            "challengeImageLink":challengeImageLink,
+                            "challengeDescription":challengeDescription,
+                            "challengeName":challengeName,
+                            "challengeId":self.challengeId
+                        ]
+                        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/completedChallengeList",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                            print(response)
+                            if (response.result.isSuccess) {
+                                self.performSegue(withIdentifier: "unwindSeguetoHomeVC", sender: nil)
+                            } else {
+                                print("upload failed!")
+                            }
+                        }
+                    } else {
+                        let params: Parameters = [
+                            "ownerChallengeImageLink":challengeImageLink,
+                            "challengeDescription":challengeDescription,
+                            "challengeName":challengeName,
+                            "challengeCreatedDate": "20 Nov 2017",
+                            "challengeType": "social"
+                        ]
+                        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/challenges", method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
+                            print(response)
+                            if (response.result.isSuccess) {
+                                self.performSegue(withIdentifier: "unwindSeguetoHomeVC", sender: nil)
+                            } else {
+                                print("upload failed!")
+                            }
+                        }
+                    }
+                    
+                    /*Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(self.userId)/challenges",method: .post, parameters: params,encoding: JSONEncoding.default) .responseString { response in // 1
                         print(response)
                         if (response.result.isSuccess) {
                             self.performSegue(withIdentifier: "unwindSeguetoHomeVC", sender: nil)
                         } else {
                             print("upload failed!")
                         }
-                    }
+                    }*/
                 } else {
                     print(error)
                 }

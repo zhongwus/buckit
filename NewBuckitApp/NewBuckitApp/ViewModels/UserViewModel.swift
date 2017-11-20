@@ -10,7 +10,7 @@ import Foundation
 import Alamofire
 import SwiftyJSON
 
-var userId = UserDefaults.standard.string(forKey: "userId")!
+public var userId = UserDefaults.standard.string(forKey: "userId")!
 
 class UsersViewModel {
     private var user = User()
@@ -40,17 +40,11 @@ class UsersViewModel {
 
 class ChallengeListViewModel {
     
-    var challengeList = [Challenge]()
+    var list = [Challenge]()
+
 }
 
 extension ChallengeListViewModel {
-    
-    /*func fetchChallenges() {
-        let challenge1 = Challenge(name: "challenge1", picture: "https://c1.staticflickr.com/3/2912/13981352255_fc59cfdba2_b.jpg")
-        let challenge2 = Challenge(name: "challenge2", picture: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRrTFkZy0h_581tHDZ7Yhb2CeUNtfxOlxjvwAi0HtB_sWe_KLpGrg")
-        
-        self.challenges = [challenge1, challenge2]
-    }*/
     
     func fetchData(handler:@escaping () -> Void) {
         Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/myChallengeList") .responseJSON { response in
@@ -60,7 +54,30 @@ extension ChallengeListViewModel {
                     let challengeId = challenge.1["id"].string
                     let challengeDescription = challenge.1["challengeDescription"].string
                     let challengeName = challenge.1["challengeName"].string
-                    self.challengeList.append(Challenge(id: challengeId!, name: challengeName!, description: challengeDescription!, image: challenge.1["ownerChallengeImageLink"].string!))
+                    self.list.append(Challenge(id: challengeId!, name: challengeName!, description: challengeDescription!, image: challenge.1["ownerChallengeImageLink"].string!))
+                    
+                }
+                handler()
+            }
+        }
+    }
+    
+}
+
+class SavedChallengeListViewModel {
+    var list = [Challenge]()
+}
+
+extension SavedChallengeListViewModel {
+    
+    func fetchData(handler:@escaping () -> Void) {
+        Alamofire.request("http://\(UserDefaults.standard.string(forKey: "ipAddress")!):8080/api/users/\(userId)/savedChallengeList") .responseJSON { response in
+            if let data = response.result.value {
+                let json = JSON(data)["content"]
+                for challenge in json {
+                    let challengeId = challenge.1["id"].string
+                    let challengeName = challenge.1["challengeName"].string
+                    self.list.append(Challenge(id: challengeId!, name: challengeName!))
                 }
                 handler()
             }

@@ -53,6 +53,7 @@ class EditProfileViewController: UIViewController {
             if response.result.isSuccess {
                 self.dismiss(animated: true, completion: nil)
                 UserDefaults.standard.set(params["firstName"], forKey: "first_name")
+                UserDefaults.standard.set(params["lastName"], forKey: "last_name")
             }
         }
     }

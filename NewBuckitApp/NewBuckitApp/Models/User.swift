@@ -27,6 +27,11 @@ struct Challenge {
         self.description = description
         self.image = image
     }
+    
+    init(id:String, name:String) {
+        self.id = id
+        self.name = name
+    }
 }
 
 

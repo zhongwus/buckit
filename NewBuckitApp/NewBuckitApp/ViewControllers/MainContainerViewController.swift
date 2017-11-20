@@ -18,6 +18,7 @@ class MainContainerViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+        print("called from main container")
         SideMenuManager.default.menuLeftNavigationController = storyboard.instantiateViewController(withIdentifier: "leftMenuNavigationController") as? UISideMenuNavigationController
         SideMenuManager.default.menuRightNavigationController = storyboard.instantiateViewController(withIdentifier: "rightMenuNavigationController") as? UISideMenuNavigationController
         SideMenuManager.default.menuPresentMode = .menuSlideIn

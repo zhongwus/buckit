@@ -26,7 +26,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         IQKeyboardManager.sharedManager().enable = true
         let storyboard = UIStoryboard(name:"Main",bundle:nil)
         
-        UserDefaults.standard.set("10.0.0.192", forKey: "ipAddress")
+        UserDefaults.standard.set("172.29.94.72", forKey: "ipAddress")
 
         if (UserDefaults.standard.string(forKey: "userId") == nil || UserDefaults.standard.string(forKey: "first_name") == nil) {
             let loginViewController = storyboard.instantiateViewController(withIdentifier: "loginViewController")
